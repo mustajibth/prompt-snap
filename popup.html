@@ -2,54 +2,58 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>PromptSnap</title>
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1>PromptSnap</h1>
+      <h1>✨ PromptSnap</h1>
       <p>AI Image Prompt Generator by Ajibid Studio</p>
     </div>
 
     <div class="section">
-      <h2>Gemini API Key</h2>
+      <h2>🔑 Gemini API Key</h2>
       <div class="input-group">
-        <input type="password" id="apiKey" placeholder="Enter your Gemini API key...">
-        <button id="toggleKey">👁️</button>
+        <input type="password" id="apiKey" placeholder="Enter your Gemini API key..." autocomplete="off">
+        <button id="toggleKey" type="button" aria-label="Toggle API key visibility">👁️</button>
       </div>
-      <p class="help-text">Get your API key from <a href="https://makersuite.google.com/app/apikey" target="_blank">Google AI Studio</a></p>
+      <p class="help-text">Get your API key from <a href="https://makersuite.google.com/app/apikey" target="_blank" rel="noopener">Google AI Studio</a></p>
     </div>
 
     <div class="section">
-      <h2>Model Selection</h2>
-      <select id="modelSelect">
-        <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
-        <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
-        <option value="gemini-2.0-flash-lite" selected>Gemini 2.0 Flash Lite</option>
+      <h2>🤖 Model Selection</h2>
+      <select id="modelSelect" aria-label="Select Gemini model">
+        <option value="gemini-1.5-flash">Gemini 1.5 Flash (Fast)</option>
+        <option value="gemini-1.5-pro">Gemini 1.5 Pro (Advanced)</option>
+        <option value="gemini-2.0-flash-lite" selected>Gemini 2.0 Flash Lite (Recommended)</option>
       </select>
     </div>
 
     <div class="section">
-      <h2>Custom Prompt</h2>
+      <h2>✏️ Custom Prompt</h2>
       <label class="toggle">
         <input type="checkbox" id="useCustomPrompt">
         <span class="slider"></span>
-        Use custom prompt
+        <span>Use custom prompt</span>
       </label>
-      <textarea id="customPrompt" placeholder="Enter your custom prompt..." style="display: none;"></textarea>
+      <textarea id="customPrompt" placeholder="Enter your custom prompt for image analysis..." style="display: none;" aria-label="Custom prompt text"></textarea>
     </div>
 
     <div class="actions">
-      <button id="saveBtn" class="btn primary">Save Settings</button>
-      <button id="scanBtn" class="btn secondary">Scan Page Images</button>
+      <button id="saveBtn" class="btn primary" type="button">
+        💾 Save Settings
+      </button>
+      <button id="scanBtn" class="btn secondary" type="button">
+        🔍 Scan Page
+      </button>
     </div>
 
     <div class="results" id="results" style="display: none;">
       <h3>Recent Results</h3>
       <div id="resultsList"></div>
-      <button id="clearResults" class="btn small">Clear All</button>
+      <button id="clearResults" class="btn small secondary" type="button">🗑️ Clear All</button>
     </div>
   </div>
 
