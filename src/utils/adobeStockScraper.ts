@@ -25,7 +25,7 @@ export class AdobeStockProxyService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.VITE_PROXY_API_KEY}`
+          'Authorization': `Bearer ${import.meta.env.VITE_PROXY_API_KEY}`
         },
         body: JSON.stringify({
           url: adobeUrl,
@@ -56,7 +56,7 @@ export class AdobeStockAPIService {
       const response = await fetch(`${this.API_BASE_URL}/Search/Files`, {
         method: 'GET',
         headers: {
-          'X-API-Key': process.env.VITE_ADOBE_API_KEY!,
+          'X-API-Key': import.meta.env.VITE_ADOBE_API_KEY!,
           'X-Product': 'PromptSnap/1.0.0'
         },
         params: new URLSearchParams({
@@ -92,7 +92,7 @@ export class AdobeStockPuppeteerService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.VITE_BACKEND_API_KEY}`
+          'Authorization': `Bearer ${import.meta.env.VITE_BACKEND_API_KEY}`
         },
         body: JSON.stringify({
           url: adobeUrl,
