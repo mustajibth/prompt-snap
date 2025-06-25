@@ -261,9 +261,9 @@ export default function AdobeStockProcessor({ isOpen, onClose, onImagesSelected 
   return (
     <>
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
-          {/* Header */}
-          <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-red-500 to-pink-500 text-white">
+        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-6xl h-[90vh] flex flex-col">
+          {/* Header - Fixed */}
+          <div className="flex-shrink-0 p-6 border-b border-gray-200 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-t-2xl">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
@@ -294,264 +294,269 @@ export default function AdobeStockProcessor({ isOpen, onClose, onImagesSelected 
             </div>
           </div>
 
-          <div className="p-6">
-            {/* Method Selector */}
-            {showMethodSelector && (
-              <div className="mb-6 bg-gray-50 border border-gray-200 rounded-xl p-4">
-                <h3 className="font-semibold text-gray-900 mb-3">Extraction Methods</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {extractionMethods.map((method) => (
-                    <button
-                      key={method.id}
-                      onClick={() => setExtractionMethod(method.id)}
-                      className={`p-3 text-left border rounded-lg transition-all ${
-                        extractionMethod === method.id
-                          ? 'border-red-500 bg-red-50'
-                          : 'border-gray-200 hover:border-gray-300 bg-white'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="font-medium text-sm">{method.name}</span>
-                        <span className={`px-2 py-1 text-xs rounded-full ${
-                          method.statusColor === 'green' ? 'bg-green-100 text-green-700' :
-                          method.statusColor === 'blue' ? 'bg-blue-100 text-blue-700' :
-                          method.statusColor === 'purple' ? 'bg-purple-100 text-purple-700' :
-                          method.statusColor === 'orange' ? 'bg-orange-100 text-orange-700' :
-                          method.statusColor === 'red' ? 'bg-red-100 text-red-700' :
-                          'bg-yellow-100 text-yellow-700'
-                        }`}>
-                          {method.status}
-                        </span>
+          {/* Scrollable Content */}
+          <div className="flex-1 overflow-y-auto">
+            <div className="p-6 space-y-6">
+              {/* Method Selector */}
+              {showMethodSelector && (
+                <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
+                  <h3 className="font-semibold text-gray-900 mb-3">Extraction Methods</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {extractionMethods.map((method) => (
+                      <button
+                        key={method.id}
+                        onClick={() => setExtractionMethod(method.id)}
+                        className={`p-3 text-left border rounded-lg transition-all ${
+                          extractionMethod === method.id
+                            ? 'border-red-500 bg-red-50'
+                            : 'border-gray-200 hover:border-gray-300 bg-white'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="font-medium text-sm">{method.name}</span>
+                          <span className={`px-2 py-1 text-xs rounded-full ${
+                            method.statusColor === 'green' ? 'bg-green-100 text-green-700' :
+                            method.statusColor === 'blue' ? 'bg-blue-100 text-blue-700' :
+                            method.statusColor === 'purple' ? 'bg-purple-100 text-purple-700' :
+                            method.statusColor === 'orange' ? 'bg-orange-100 text-orange-700' :
+                            method.statusColor === 'red' ? 'bg-red-100 text-red-700' :
+                            'bg-yellow-100 text-yellow-700'
+                          }`}>
+                            {method.status}
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-600">{method.description}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Current Method Display */}
+              <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm font-medium text-blue-800">
+                    Current Method: {extractionMethods.find(m => m.id === extractionMethod)?.name}
+                  </span>
+                  <span className={`px-2 py-1 text-xs rounded-full ${
+                    extractionMethod === 'demo' ? 'bg-green-100 text-green-700' :
+                    extractionMethod === 'extension' ? 'bg-blue-100 text-blue-700' :
+                    'bg-orange-100 text-orange-700'
+                  }`}>
+                    {extractionMethods.find(m => m.id === extractionMethod)?.status}
+                  </span>
+                </div>
+              </div>
+
+              {/* URL Input Section */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {extractionMethod === 'extension' ? 'Current Tab' : 'Adobe Stock URL'}
+                </label>
+                <div className="flex space-x-3">
+                  <div className="flex-1 relative">
+                    <Link className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type="url"
+                      value={adobeUrl}
+                      onChange={(e) => setAdobeUrl(e.target.value)}
+                      placeholder={
+                        extractionMethod === 'extension' 
+                          ? 'Will extract from current Adobe Stock tab'
+                          : 'https://stock.adobe.com/search?k=landscape'
+                      }
+                      disabled={extractionMethod === 'extension'}
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:bg-gray-100"
+                    />
+                  </div>
+                  <div className="w-32">
+                    <input
+                      type="number"
+                      value={imageCount}
+                      onChange={(e) => setImageCount(Math.min(100, Math.max(1, parseInt(e.target.value) || 1)))}
+                      min="1"
+                      max="100"
+                      className="w-full px-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent text-center"
+                      placeholder="Count"
+                    />
+                  </div>
+                  <button
+                    onClick={handleExtractImages}
+                    disabled={isProcessing || (!adobeUrl.trim() && extractionMethod !== 'extension')}
+                    className="px-6 py-3 bg-red-500 hover:bg-red-600 disabled:bg-gray-300 text-white rounded-xl font-medium transition-colors flex items-center space-x-2"
+                  >
+                    {isProcessing ? (
+                      <>
+                        <Loader className="w-4 h-4 animate-spin" />
+                        <span>Extracting...</span>
+                      </>
+                    ) : (
+                      <>
+                        <ImageIcon className="w-4 h-4" />
+                        <span>Extract</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+                
+                {/* Method-specific Instructions */}
+                <div className="mt-4 bg-blue-50 border border-blue-200 rounded-xl p-4">
+                  <h4 className="font-medium text-blue-800 mb-2">
+                    📋 {extractionMethods.find(m => m.id === extractionMethod)?.name} Instructions:
+                  </h4>
+                  <ul className="text-blue-700 text-sm space-y-1">
+                    {extractionMethod === 'demo' && (
+                      <>
+                        <li>• Uses placeholder images from Pexels for demonstration</li>
+                        <li>• Enter any URL to simulate Adobe Stock extraction</li>
+                        <li>• Perfect for testing the batch processing workflow</li>
+                      </>
+                    )}
+                    {extractionMethod === 'extension' && (
+                      <>
+                        <li>• Navigate to Adobe Stock in another tab first</li>
+                        <li>• Click "Extract" to get images from current tab</li>
+                        <li>• Works with search results and collection pages</li>
+                      </>
+                    )}
+                    {extractionMethod === 'api' && (
+                      <>
+                        <li>• Requires Adobe Stock API key in environment variables</li>
+                        <li>• Official API with high rate limits and quality</li>
+                        <li>• Best for production applications</li>
+                      </>
+                    )}
+                    {extractionMethod === 'proxy' && (
+                      <>
+                        <li>• Requires backend proxy service setup</li>
+                        <li>• Bypasses CORS restrictions effectively</li>
+                        <li>• Good for server-side processing</li>
+                      </>
+                    )}
+                    {extractionMethod === 'puppeteer' && (
+                      <>
+                        <li>• Requires Puppeteer backend service</li>
+                        <li>• Most reliable for complex page structures</li>
+                        <li>• Handles JavaScript-rendered content</li>
+                      </>
+                    )}
+                    {extractionMethod === 'cors' && (
+                      <>
+                        <li>• Uses public CORS proxy service</li>
+                        <li>• Limited by proxy service availability</li>
+                        <li>• May have rate limiting restrictions</li>
+                      </>
+                    )}
+                  </ul>
+                </div>
+
+                {/* Implementation Notice */}
+                {extractionMethod !== 'demo' && (
+                  <div className="mt-3 bg-amber-50 border border-amber-200 rounded-xl p-4">
+                    <div className="flex items-start space-x-2">
+                      <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-amber-800 text-sm">
+                          <strong>Implementation Required:</strong> This method requires additional setup. 
+                          Currently showing demo mode. See the implementation guide in the code for details.
+                        </p>
                       </div>
-                      <p className="text-xs text-gray-600">{method.description}</p>
-                    </button>
-                  ))}
-                </div>
+                    </div>
+                  </div>
+                )}
               </div>
-            )}
 
-            {/* Current Method Display */}
-            <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-              <div className="flex items-center space-x-2">
-                <span className="text-sm font-medium text-blue-800">
-                  Current Method: {extractionMethods.find(m => m.id === extractionMethod)?.name}
-                </span>
-                <span className={`px-2 py-1 text-xs rounded-full ${
-                  extractionMethod === 'demo' ? 'bg-green-100 text-green-700' :
-                  extractionMethod === 'extension' ? 'bg-blue-100 text-blue-700' :
-                  'bg-orange-100 text-orange-700'
+              {/* Status */}
+              {processingStatus && (
+                <div className={`p-3 rounded-lg flex items-center space-x-2 ${
+                  processingStatus.includes('Error') 
+                    ? 'bg-red-50 text-red-700 border border-red-200' 
+                    : processingStatus.includes('Successfully')
+                    ? 'bg-green-50 text-green-700 border border-green-200'
+                    : 'bg-blue-50 text-blue-700 border border-blue-200'
                 }`}>
-                  {extractionMethods.find(m => m.id === extractionMethod)?.status}
-                </span>
-              </div>
-            </div>
-
-            {/* URL Input Section */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {extractionMethod === 'extension' ? 'Current Tab' : 'Adobe Stock URL'}
-              </label>
-              <div className="flex space-x-3">
-                <div className="flex-1 relative">
-                  <Link className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="url"
-                    value={adobeUrl}
-                    onChange={(e) => setAdobeUrl(e.target.value)}
-                    placeholder={
-                      extractionMethod === 'extension' 
-                        ? 'Will extract from current Adobe Stock tab'
-                        : 'https://stock.adobe.com/search?k=landscape'
-                    }
-                    disabled={extractionMethod === 'extension'}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:bg-gray-100"
-                  />
-                </div>
-                <div className="w-32">
-                  <input
-                    type="number"
-                    value={imageCount}
-                    onChange={(e) => setImageCount(Math.min(100, Math.max(1, parseInt(e.target.value) || 1)))}
-                    min="1"
-                    max="100"
-                    className="w-full px-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent text-center"
-                    placeholder="Count"
-                  />
-                </div>
-                <button
-                  onClick={handleExtractImages}
-                  disabled={isProcessing || (!adobeUrl.trim() && extractionMethod !== 'extension')}
-                  className="px-6 py-3 bg-red-500 hover:bg-red-600 disabled:bg-gray-300 text-white rounded-xl font-medium transition-colors flex items-center space-x-2"
-                >
-                  {isProcessing ? (
-                    <>
-                      <Loader className="w-4 h-4 animate-spin" />
-                      <span>Extracting...</span>
-                    </>
+                  {processingStatus.includes('Error') ? (
+                    <AlertCircle className="w-4 h-4" />
+                  ) : processingStatus.includes('Successfully') ? (
+                    <CheckCircle className="w-4 h-4" />
                   ) : (
-                    <>
-                      <ImageIcon className="w-4 h-4" />
-                      <span>Extract</span>
-                    </>
+                    <Loader className="w-4 h-4 animate-spin" />
                   )}
-                </button>
-              </div>
-              
-              {/* Method-specific Instructions */}
-              <div className="mt-4 bg-blue-50 border border-blue-200 rounded-xl p-4">
-                <h4 className="font-medium text-blue-800 mb-2">
-                  📋 {extractionMethods.find(m => m.id === extractionMethod)?.name} Instructions:
-                </h4>
-                <ul className="text-blue-700 text-sm space-y-1">
-                  {extractionMethod === 'demo' && (
-                    <>
-                      <li>• Uses placeholder images from Pexels for demonstration</li>
-                      <li>• Enter any URL to simulate Adobe Stock extraction</li>
-                      <li>• Perfect for testing the batch processing workflow</li>
-                    </>
-                  )}
-                  {extractionMethod === 'extension' && (
-                    <>
-                      <li>• Navigate to Adobe Stock in another tab first</li>
-                      <li>• Click "Extract" to get images from current tab</li>
-                      <li>• Works with search results and collection pages</li>
-                    </>
-                  )}
-                  {extractionMethod === 'api' && (
-                    <>
-                      <li>• Requires Adobe Stock API key in environment variables</li>
-                      <li>• Official API with high rate limits and quality</li>
-                      <li>• Best for production applications</li>
-                    </>
-                  )}
-                  {extractionMethod === 'proxy' && (
-                    <>
-                      <li>• Requires backend proxy service setup</li>
-                      <li>• Bypasses CORS restrictions effectively</li>
-                      <li>• Good for server-side processing</li>
-                    </>
-                  )}
-                  {extractionMethod === 'puppeteer' && (
-                    <>
-                      <li>• Requires Puppeteer backend service</li>
-                      <li>• Most reliable for complex page structures</li>
-                      <li>• Handles JavaScript-rendered content</li>
-                    </>
-                  )}
-                  {extractionMethod === 'cors' && (
-                    <>
-                      <li>• Uses public CORS proxy service</li>
-                      <li>• Limited by proxy service availability</li>
-                      <li>• May have rate limiting restrictions</li>
-                    </>
-                  )}
-                </ul>
-              </div>
+                  <span className="text-sm font-medium">{processingStatus}</span>
+                </div>
+              )}
 
-              {/* Implementation Notice */}
-              {extractionMethod !== 'demo' && (
-                <div className="mt-3 bg-amber-50 border border-amber-200 rounded-xl p-4">
-                  <div className="flex items-start space-x-2">
-                    <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-amber-800 text-sm">
-                        <strong>Implementation Required:</strong> This method requires additional setup. 
-                        Currently showing demo mode. See the implementation guide in the code for details.
-                      </p>
+              {/* Extracted Images Grid */}
+              {extractedImages.length > 0 && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      Extracted Images ({extractedImages.length})
+                    </h3>
+                    <button
+                      onClick={selectAllImages}
+                      className="px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 border border-red-200 hover:border-red-300 rounded-lg transition-colors"
+                    >
+                      {selectedImages.size === extractedImages.length ? 'Deselect All' : 'Select All'}
+                    </button>
+                  </div>
+
+                  <div className="border border-gray-200 rounded-xl p-4 bg-gray-50">
+                    <div className="max-h-80 overflow-y-auto">
+                      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                        {extractedImages.map((image, index) => (
+                          <div
+                            key={image.url}
+                            className={`relative group cursor-pointer rounded-lg overflow-hidden border-2 transition-all ${
+                              selectedImages.has(image.url)
+                                ? 'border-red-500 ring-2 ring-red-200'
+                                : 'border-transparent hover:border-gray-300'
+                            }`}
+                            onClick={() => toggleImageSelection(image.url)}
+                          >
+                            <div className="aspect-square bg-gray-100">
+                              <img
+                                src={image.thumbnail}
+                                alt={image.title}
+                                className="w-full h-full object-cover"
+                                loading="lazy"
+                              />
+                            </div>
+                            
+                            {/* Selection Overlay */}
+                            <div className={`absolute inset-0 bg-red-500/20 flex items-center justify-center transition-opacity ${
+                              selectedImages.has(image.url) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                            }`}>
+                              <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                                selectedImages.has(image.url)
+                                  ? 'bg-red-500 border-red-500'
+                                  : 'bg-white border-white'
+                              }`}>
+                                {selectedImages.has(image.url) && (
+                                  <CheckCircle className="w-4 h-4 text-white" />
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Image Number */}
+                            <div className="absolute top-2 left-2">
+                              <span className="px-2 py-1 text-xs rounded-full bg-black/70 text-white font-medium">
+                                #{index + 1}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
               )}
             </div>
-
-            {/* Status */}
-            {processingStatus && (
-              <div className={`mb-4 p-3 rounded-lg flex items-center space-x-2 ${
-                processingStatus.includes('Error') 
-                  ? 'bg-red-50 text-red-700 border border-red-200' 
-                  : processingStatus.includes('Successfully')
-                  ? 'bg-green-50 text-green-700 border border-green-200'
-                  : 'bg-blue-50 text-blue-700 border border-blue-200'
-              }`}>
-                {processingStatus.includes('Error') ? (
-                  <AlertCircle className="w-4 h-4" />
-                ) : processingStatus.includes('Successfully') ? (
-                  <CheckCircle className="w-4 h-4" />
-                ) : (
-                  <Loader className="w-4 h-4 animate-spin" />
-                )}
-                <span className="text-sm font-medium">{processingStatus}</span>
-              </div>
-            )}
-
-            {/* Extracted Images Grid */}
-            {extractedImages.length > 0 && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    Extracted Images ({extractedImages.length})
-                  </h3>
-                  <button
-                    onClick={selectAllImages}
-                    className="px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 border border-red-200 hover:border-red-300 rounded-lg transition-colors"
-                  >
-                    {selectedImages.size === extractedImages.length ? 'Deselect All' : 'Select All'}
-                  </button>
-                </div>
-
-                <div className="max-h-96 overflow-y-auto border border-gray-200 rounded-xl p-4">
-                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-                    {extractedImages.map((image, index) => (
-                      <div
-                        key={image.url}
-                        className={`relative group cursor-pointer rounded-lg overflow-hidden border-2 transition-all ${
-                          selectedImages.has(image.url)
-                            ? 'border-red-500 ring-2 ring-red-200'
-                            : 'border-transparent hover:border-gray-300'
-                        }`}
-                        onClick={() => toggleImageSelection(image.url)}
-                      >
-                        <div className="aspect-square bg-gray-100">
-                          <img
-                            src={image.thumbnail}
-                            alt={image.title}
-                            className="w-full h-full object-cover"
-                            loading="lazy"
-                          />
-                        </div>
-                        
-                        {/* Selection Overlay */}
-                        <div className={`absolute inset-0 bg-red-500/20 flex items-center justify-center transition-opacity ${
-                          selectedImages.has(image.url) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-                        }`}>
-                          <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                            selectedImages.has(image.url)
-                              ? 'bg-red-500 border-red-500'
-                              : 'bg-white border-white'
-                          }`}>
-                            {selectedImages.has(image.url) && (
-                              <CheckCircle className="w-4 h-4 text-white" />
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Image Number */}
-                        <div className="absolute top-2 left-2">
-                          <span className="px-2 py-1 text-xs rounded-full bg-black/70 text-white font-medium">
-                            #{index + 1}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
 
-          {/* Footer */}
+          {/* Footer - Fixed */}
           {extractedImages.length > 0 && (
-            <div className="p-6 border-t border-gray-200 bg-gray-50">
+            <div className="flex-shrink-0 p-6 border-t border-gray-200 bg-gray-50 rounded-b-2xl">
               <div className="flex items-center justify-between">
                 <div className="text-sm text-gray-600">
                   <span className="font-medium">{selectedImages.size}</span> of{' '}
