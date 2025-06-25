@@ -263,30 +263,11 @@ ${content}`;
                 </>
               )}
             </div>
-
-            {/* Mobile Action Buttons - Only show icon buttons in header */}
-            <div className="flex md:hidden items-center space-x-2">
-              <button
-                onClick={() => setShowScrapingModal(true)}
-                className="p-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors duration-200"
-                title="Search Stock Images"
-              >
-                <Globe className="w-5 h-5" />
-              </button>
-
-              <button
-                onClick={() => setShowAPIKeyManager(true)}
-                className="p-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition-colors duration-200"
-                title="Manage API Keys"
-              >
-                <Key className="w-5 h-5" />
-              </button>
-            </div>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24 md:pb-8">
         {/* API Key Warning */}
         {!import.meta.env.VITE_GEMINI_API_KEY && (
           <div className="mb-8 bg-amber-50 border border-amber-200 rounded-xl p-6">
@@ -378,37 +359,67 @@ ${content}`;
             ))}
           </div>
         )}
-
-        {/* Mobile Action Buttons - Below content */}
-        {analyses.length > 0 && (
-          <div className="md:hidden mt-8 space-y-4">
-            {/* Status Info */}
-            <div className="text-center text-sm text-gray-600 bg-white rounded-lg p-4 shadow-sm">
-              {completedCount} completed • {processingCount} processing • {errorCount} errors
-            </div>
-            
-            {/* Action Buttons */}
-            <div className="grid grid-cols-1 gap-3">
-              {completedCount > 0 && (
-                <button
-                  onClick={handleDownloadAll}
-                  className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors duration-200"
-                >
-                  <Download className="w-5 h-5" />
-                  <span>Download All Prompts</span>
-                </button>
-              )}
-
-              <button
-                onClick={clearAll}
-                className="w-full px-4 py-3 text-gray-600 hover:text-gray-800 bg-white border border-gray-300 hover:border-gray-400 rounded-lg font-medium transition-colors duration-200"
-              >
-                Clear All Results
-              </button>
-            </div>
-          </div>
-        )}
       </main>
+
+      {/* Mobile Bottom Navigation */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 z-50">
+        <div className="flex items-center justify-between">
+          {/* Left side - Action buttons */}
+          <div className="flex items-center space-x-3">
+            <button
+              onClick={() => setShowScrapingModal(true)}
+              className="flex flex-col items-center justify-center p-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors duration-200 min-w-[60px]"
+              title="Search Stock Images"
+            >
+              <Globe className="w-5 h-5 mb-1" />
+              <span className="text-xs font-medium">Search</span>
+            </button>
+
+            <button
+              onClick={() => setShowAPIKeyManager(true)}
+              className="flex flex-col items-center justify-center p-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition-colors duration-200 min-w-[60px]"
+              title="Manage API Keys"
+            >
+              <Key className="w-5 h-5 mb-1" />
+              <span className="text-xs font-medium">API Keys</span>
+            </button>
+
+            {completedCount > 0 && (
+              <button
+                onClick={handleDownloadAll}
+                className="flex flex-col items-center justify-center p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors duration-200 min-w-[60px]"
+                title="Download All Prompts"
+              >
+                <Download className="w-5 h-5 mb-1" />
+                <span className="text-xs font-medium">Download</span>
+              </button>
+            )}
+          </div>
+
+          {/* Right side - Status and Clear */}
+          <div className="flex items-center space-x-3">
+            {analyses.length > 0 && (
+              <>
+                <div className="text-center">
+                  <div className="text-xs text-gray-600 font-medium">
+                    {completedCount}/{analyses.length}
+                  </div>
+                  <div className="text-xs text-gray-500">completed</div>
+                </div>
+                
+                <button
+                  onClick={clearAll}
+                  className="flex flex-col items-center justify-center p-2 text-gray-600 hover:text-gray-800 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200 min-w-[60px]"
+                  title="Clear All Results"
+                >
+                  <Settings className="w-5 h-5 mb-1" />
+                  <span className="text-xs font-medium">Clear</span>
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
 
       {/* Modals */}
       <APIKeyManager 
