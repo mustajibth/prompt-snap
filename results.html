@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PromptSnap Results</title>
+  <link rel="stylesheet" href="results.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="header-content">
+        <div class="header-title">
+          <h1>PromptSnap Results</h1>
+          <p>Your generated AI prompts</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn secondary" id="clearAllBtn">Clear All</button>
+          <button class="btn primary" id="exportAllBtn">Export All</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="main">
+      <div class="results-container" id="resultsContainer">
+        <div class="loading" id="loading">
+          <div class="spinner"></div>
+          <p>Loading results...</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="results.js"></script>
+</body>
+</html>
