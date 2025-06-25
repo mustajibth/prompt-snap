@@ -1,9 +1,10 @@
 import React, { useState, useCallback } from 'react';
-import { Download, Zap, FileText, AlertTriangle, Settings, Globe, Key } from 'lucide-react';
+import { Download, Zap, FileText, AlertTriangle, Settings, Globe, Key, Link } from 'lucide-react';
 import UploadArea from './components/UploadArea';
 import PromptCard from './components/PromptCard';
 import APIKeyManager from './components/APIKeyManager';
 import ScrapingModal from './components/ScrapingModal';
+import AdobeStockProcessor from './components/AdobeStockProcessor';
 import { ImageAnalysis, ScrapedImage } from './types';
 import { analyzeImageWithGemini, analyzeImageFromUrl } from './utils/gemini';
 
@@ -12,6 +13,7 @@ function App() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [showAPIKeyManager, setShowAPIKeyManager] = useState(false);
   const [showScrapingModal, setShowScrapingModal] = useState(false);
+  const [showAdobeProcessor, setShowAdobeProcessor] = useState(false);
 
   const handleFilesSelected = useCallback(async (files: File[]) => {
     const newAnalyses: ImageAnalysis[] = files.map(file => ({
@@ -219,6 +221,15 @@ ${content}`;
             {/* Desktop Action Buttons */}
             <div className="hidden md:flex items-center space-x-4">
               <button
+                onClick={() => setShowAdobeProcessor(true)}
+                className="inline-flex items-center space-x-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors duration-200"
+                title="Adobe Stock Batch Processor"
+              >
+                <Link className="w-4 h-4" />
+                <span>Adobe Stock</span>
+              </button>
+
+              <button
                 onClick={() => setShowScrapingModal(true)}
                 className="inline-flex items-center space-x-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors duration-200"
                 title="Search Stock Images"
@@ -303,6 +314,15 @@ ${content}`;
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className="text-center">
+                  <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <Link className="w-6 h-6 text-red-600" />
+                  </div>
+                  <h3 className="font-medium text-gray-800 mb-2">Adobe Stock Batch</h3>
+                  <p className="text-gray-600 text-sm">
+                    Extract and analyze up to 100 images from Adobe Stock URLs
+                  </p>
+                </div>
+                <div className="text-center">
                   <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
                     <FileText className="w-6 h-6 text-blue-600" />
                   </div>
@@ -327,15 +347,6 @@ ${content}`;
                   <h3 className="font-medium text-gray-800 mb-2">Multi API Keys</h3>
                   <p className="text-gray-600 text-sm">
                     Load balance across multiple Gemini API keys
-                  </p>
-                </div>
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <Zap className="w-6 h-6 text-teal-600" />
-                  </div>
-                  <h3 className="font-medium text-gray-800 mb-2">Prompt Variations</h3>
-                  <p className="text-gray-600 text-sm">
-                    Generate creative, technical, artistic, or commercial prompts
                   </p>
                 </div>
               </div>
@@ -366,6 +377,15 @@ ${content}`;
         <div className="flex items-center justify-between">
           {/* Left side - Action buttons */}
           <div className="flex items-center space-x-3">
+            <button
+              onClick={() => setShowAdobeProcessor(true)}
+              className="flex flex-col items-center justify-center p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors duration-200 min-w-[60px]"
+              title="Adobe Stock Batch"
+            >
+              <Link className="w-5 h-5 mb-1" />
+              <span className="text-xs font-medium">Adobe</span>
+            </button>
+
             <button
               onClick={() => setShowScrapingModal(true)}
               className="flex flex-col items-center justify-center p-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors duration-200 min-w-[60px]"
@@ -430,6 +450,12 @@ ${content}`;
       <ScrapingModal 
         isOpen={showScrapingModal} 
         onClose={() => setShowScrapingModal(false)} 
+        onImagesSelected={handleScrapedImagesSelected}
+      />
+
+      <AdobeStockProcessor
+        isOpen={showAdobeProcessor}
+        onClose={() => setShowAdobeProcessor(false)}
         onImagesSelected={handleScrapedImagesSelected}
       />
     </div>
