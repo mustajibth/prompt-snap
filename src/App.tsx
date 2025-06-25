@@ -216,15 +216,15 @@ ${content}`;
               </div>
             </div>
 
-            <div className="flex items-center space-x-4">
-              {/* Action Buttons - Mobile Responsive */}
+            {/* Desktop Action Buttons */}
+            <div className="hidden md:flex items-center space-x-4">
               <button
                 onClick={() => setShowScrapingModal(true)}
                 className="inline-flex items-center space-x-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors duration-200"
                 title="Search Stock Images"
               >
                 <Globe className="w-4 h-4" />
-                <span className="hidden sm:inline">Search Stock</span>
+                <span>Search Stock</span>
               </button>
 
               <button
@@ -233,12 +233,12 @@ ${content}`;
                 title="Manage API Keys"
               >
                 <Key className="w-4 h-4" />
-                <span className="hidden sm:inline">API Keys</span>
+                <span>API Keys</span>
               </button>
 
               {analyses.length > 0 && (
                 <>
-                  <div className="hidden md:block text-sm text-gray-600">
+                  <div className="text-sm text-gray-600">
                     {completedCount} completed • {processingCount} processing • {errorCount} errors
                   </div>
                   
@@ -249,7 +249,7 @@ ${content}`;
                       title="Download All Prompts"
                     >
                       <Download className="w-4 h-4" />
-                      <span className="hidden sm:inline">Download All</span>
+                      <span>Download All</span>
                     </button>
                   )}
 
@@ -258,11 +258,29 @@ ${content}`;
                     className="px-4 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 hover:border-gray-400 rounded-lg font-medium transition-colors duration-200"
                     title="Clear All Results"
                   >
-                    <span className="hidden sm:inline">Clear All</span>
-                    <span className="sm:hidden">Clear</span>
+                    Clear All
                   </button>
                 </>
               )}
+            </div>
+
+            {/* Mobile Action Buttons - Only show icon buttons in header */}
+            <div className="flex md:hidden items-center space-x-2">
+              <button
+                onClick={() => setShowScrapingModal(true)}
+                className="p-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors duration-200"
+                title="Search Stock Images"
+              >
+                <Globe className="w-5 h-5" />
+              </button>
+
+              <button
+                onClick={() => setShowAPIKeyManager(true)}
+                className="p-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition-colors duration-200"
+                title="Manage API Keys"
+              >
+                <Key className="w-5 h-5" />
+              </button>
             </div>
           </div>
         </div>
@@ -358,6 +376,36 @@ ${content}`;
                 onRegeneratePrompt={handleRegeneratePrompt}
               />
             ))}
+          </div>
+        )}
+
+        {/* Mobile Action Buttons - Below content */}
+        {analyses.length > 0 && (
+          <div className="md:hidden mt-8 space-y-4">
+            {/* Status Info */}
+            <div className="text-center text-sm text-gray-600 bg-white rounded-lg p-4 shadow-sm">
+              {completedCount} completed • {processingCount} processing • {errorCount} errors
+            </div>
+            
+            {/* Action Buttons */}
+            <div className="grid grid-cols-1 gap-3">
+              {completedCount > 0 && (
+                <button
+                  onClick={handleDownloadAll}
+                  className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors duration-200"
+                >
+                  <Download className="w-5 h-5" />
+                  <span>Download All Prompts</span>
+                </button>
+              )}
+
+              <button
+                onClick={clearAll}
+                className="w-full px-4 py-3 text-gray-600 hover:text-gray-800 bg-white border border-gray-300 hover:border-gray-400 rounded-lg font-medium transition-colors duration-200"
+              >
+                Clear All Results
+              </button>
+            </div>
           </div>
         )}
       </main>
