@@ -56,8 +56,8 @@ class PromptSnapBackground {
     const imageData = await this.fetchImageAsBase64(imageUrl);
     
     const promptText = settings.useCustomPrompt && settings.customPrompt 
-      ? settings.customPrompt
-      : 'Analyze this image and create a detailed prompt for AI image generation. Focus on describing the visual elements, style, composition, colors, lighting, mood, and artistic technique. Make it specific and vivid for AI art generation.';
+      ? this.enhanceCustomPrompt(settings.customPrompt)
+      : this.getEnhancedDefaultPrompt();
 
     const requestBody = {
       contents: [
@@ -74,10 +74,10 @@ class PromptSnapBackground {
         }
       ],
       generationConfig: {
-        temperature: 0.8,
+        temperature: 0.7, // More consistent results
         topK: 40,
-        topP: 0.95,
-        maxOutputTokens: 300,
+        topP: 0.9, // More focused
+        maxOutputTokens: 400, // More detailed prompts
       }
     };
 
@@ -101,7 +101,79 @@ class PromptSnapBackground {
       throw new Error('No response generated from Gemini API');
     }
 
-    return data.candidates[0].content.parts[0].text.trim();
+    return this.cleanAndEnhancePrompt(data.candidates[0].content.parts[0].text.trim());
+  }
+
+  getEnhancedDefaultPrompt() {
+    return `You are an expert AI prompt engineer. Analyze this image with extreme precision and create a highly detailed prompt for AI image generation that would recreate this image with maximum accuracy.
+
+REQUIREMENTS:
+1. Be extremely specific about every visual element
+2. Use precise color descriptions (specific color names, not generic ones)
+3. Describe lighting in detail (direction, quality, color temperature)
+4. Specify exact composition and framing
+5. Include texture and material descriptions
+6. Mention artistic style or photographic technique
+7. Describe mood and atmosphere
+8. Include any technical camera details you can infer
+
+STRUCTURE: Write as a single, comprehensive prompt without sections or bullet points. Start with the main subject, then describe composition, lighting, colors, textures, style, and mood.
+
+EXAMPLE QUALITY: Instead of "a woman in a red dress" write "a young woman with flowing auburn hair wearing a deep crimson silk evening gown with subtle golden embroidery, photographed in soft golden hour lighting with a shallow depth of field, creating a dreamy bokeh background of warm amber tones"
+
+Analyze the image and create your detailed prompt:`;
+  }
+
+  enhanceCustomPrompt(customPrompt) {
+    const enhancementPrefix = `You are an expert AI prompt engineer. Using the following custom instructions as your guide, analyze this image with extreme precision and create a highly detailed prompt for AI image generation.
+
+CUSTOM INSTRUCTIONS: ${customPrompt}
+
+ENHANCEMENT REQUIREMENTS:
+- Be extremely specific about visual details
+- Use precise color descriptions
+- Describe lighting conditions in detail
+- Include composition and framing details
+- Mention textures and materials
+- Specify artistic style if applicable
+- Describe mood and atmosphere
+
+Create your enhanced prompt based on the custom instructions above:`;
+
+    return enhancementPrefix;
+  }
+
+  cleanAndEnhancePrompt(prompt) {
+    // Remove common AI artifacts
+    let cleaned = prompt
+      .replace(/^(Here's|Here is|This is|I can see|The image shows|This image depicts|Based on the image)/i, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    // Ensure proper capitalization
+    if (!cleaned.match(/^[A-Z]/)) {
+      cleaned = cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+    }
+
+    // Add quality enhancers if missing
+    const qualityTerms = ['detailed', 'high quality', 'professional', 'sharp', 'clear'];
+    const hasQualityTerm = qualityTerms.some(term => cleaned.toLowerCase().includes(term));
+    
+    if (!hasQualityTerm) {
+      cleaned = `Highly detailed, professional quality, ${cleaned}`;
+    }
+
+    // Ensure proper ending
+    if (!cleaned.endsWith('.') && !cleaned.endsWith(',')) {
+      cleaned += '.';
+    }
+
+    // Add technical enhancement for better AI generation
+    if (!cleaned.includes('8k') && !cleaned.includes('4k') && !cleaned.includes('high resolution')) {
+      cleaned += ' High resolution, sharp focus, professional photography quality.';
+    }
+
+    return cleaned;
   }
 
   async fetchImageAsBase64(imageUrl) {

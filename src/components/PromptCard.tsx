@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Copy, Check, AlertCircle, Loader, Palette, Download } from 'lucide-react';
+import { Copy, Check, AlertCircle, Loader, Palette, Download, RefreshCw, Zap } from 'lucide-react';
 import { ImageAnalysis, PromptVariation } from '../types';
 import { getPromptVariations } from '../utils/gemini';
 
@@ -12,6 +12,7 @@ export default function PromptCard({ analysis, onRegeneratePrompt }: PromptCardP
   const [copied, setCopied] = useState(false);
   const [selectedVariation, setSelectedVariation] = useState<string>('creative');
   const [showVariations, setShowVariations] = useState(false);
+  const [showPromptAnalysis, setShowPromptAnalysis] = useState(false);
 
   const variations = getPromptVariations();
 
@@ -35,14 +36,27 @@ File: ${analysis.file.name}
 Generated: ${new Date().toLocaleString()}
 Variation: ${selectedVariation}
 Source: ${analysis.source || 'upload'}
+Image Size: ${(analysis.file.size / 1024 / 1024).toFixed(2)} MB
 
-${analysis.prompt}`;
+=== GENERATED PROMPT ===
+${analysis.prompt}
+
+=== PROMPT ANALYSIS ===
+Length: ${analysis.prompt.length} characters
+Word Count: ${analysis.prompt.split(' ').length} words
+Style: ${selectedVariation}
+
+=== USAGE TIPS ===
+- Use this prompt with AI image generators like Midjourney, DALL-E, or Stable Diffusion
+- You can modify specific details to customize the output
+- Add style modifiers like "in the style of [artist]" for artistic variations
+- Adjust quality terms like "8k", "photorealistic", or "highly detailed" as needed`;
 
     const blob = new Blob([content], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `prompt-${analysis.file.name.replace(/\.[^/.]+$/, '')}.txt`;
+    a.download = `promptsnap-${analysis.file.name.replace(/\.[^/.]+$/, '')}-${selectedVariation}.txt`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -72,9 +86,9 @@ ${analysis.prompt}`;
   const getStatusText = () => {
     switch (analysis.status) {
       case 'analyzing':
-        return 'Analyzing image...';
+        return 'Analyzing image with enhanced AI...';
       case 'completed':
-        return 'Analysis complete';
+        return 'High-quality prompt generated';
       case 'error':
         return analysis.error || 'Analysis failed';
       default:
@@ -95,6 +109,29 @@ ${analysis.prompt}`;
       </span>
     );
   };
+
+  const getPromptQualityScore = () => {
+    if (!analysis.prompt) return null;
+    
+    const prompt = analysis.prompt.toLowerCase();
+    let score = 0;
+    
+    // Check for quality indicators
+    const qualityTerms = ['detailed', 'high quality', 'professional', 'sharp', 'clear', '8k', '4k', 'photorealistic'];
+    const colorTerms = ['blue', 'red', 'green', 'golden', 'crimson', 'azure', 'emerald'];
+    const lightingTerms = ['lighting', 'illuminated', 'shadows', 'bright', 'dark', 'soft light', 'dramatic'];
+    const compositionTerms = ['composition', 'framing', 'perspective', 'angle', 'close-up', 'wide shot'];
+    
+    if (qualityTerms.some(term => prompt.includes(term))) score += 25;
+    if (colorTerms.some(term => prompt.includes(term))) score += 20;
+    if (lightingTerms.some(term => prompt.includes(term))) score += 25;
+    if (compositionTerms.some(term => prompt.includes(term))) score += 20;
+    if (analysis.prompt.length > 200) score += 10;
+    
+    return Math.min(score, 100);
+  };
+
+  const qualityScore = getPromptQualityScore();
 
   return (
     <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden group">
@@ -120,6 +157,19 @@ ${analysis.prompt}`;
         {getSourceBadge() && (
           <div className="absolute top-3 left-3">
             {getSourceBadge()}
+          </div>
+        )}
+
+        {/* Quality Score */}
+        {qualityScore && (
+          <div className="absolute bottom-3 left-3">
+            <div className={`px-2 py-1 text-xs rounded-full font-medium ${
+              qualityScore >= 80 ? 'bg-green-100 text-green-800' :
+              qualityScore >= 60 ? 'bg-yellow-100 text-yellow-800' :
+              'bg-red-100 text-red-800'
+            }`}>
+              Quality: {qualityScore}%
+            </div>
           </div>
         )}
       </div>
@@ -151,45 +201,97 @@ ${analysis.prompt}`;
           {getStatusText()}
         </p>
 
-        {/* Prompt Variations */}
+        {/* Enhanced Prompt Variations */}
         {analysis.status === 'completed' && onRegeneratePrompt && (
           <div className="mb-4">
             <button
               onClick={() => setShowVariations(!showVariations)}
-              className="flex items-center space-x-2 text-sm text-blue-600 hover:text-blue-700 font-medium"
+              className="flex items-center space-x-2 text-sm text-blue-600 hover:text-blue-700 font-medium mb-2"
             >
               <Palette className="w-4 h-4" />
               <span>Prompt Variations</span>
+              <Zap className="w-3 h-3" />
             </button>
             
             {showVariations && (
-              <div className="mt-2 grid grid-cols-2 gap-2">
-                {variations.map((variation) => (
-                  <button
-                    key={variation.style}
-                    onClick={() => handleVariationChange(variation.style)}
-                    className={`p-2 text-xs rounded-lg border transition-colors ${
-                      selectedVariation === variation.style
-                        ? 'bg-blue-50 border-blue-200 text-blue-700'
-                        : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
-                    }`}
-                  >
-                    <div className="font-medium capitalize">{variation.style}</div>
-                    <div className="text-xs opacity-75 mt-1">{variation.description}</div>
-                  </button>
-                ))}
+              <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-2">
+                  {variations.map((variation) => (
+                    <button
+                      key={variation.style}
+                      onClick={() => handleVariationChange(variation.style)}
+                      className={`p-3 text-xs rounded-lg border transition-all duration-200 ${
+                        selectedVariation === variation.style
+                          ? 'bg-blue-50 border-blue-200 text-blue-700 shadow-sm'
+                          : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100 hover:border-gray-300'
+                      }`}
+                    >
+                      <div className="font-medium capitalize mb-1">{variation.style}</div>
+                      <div className="text-xs opacity-75 leading-tight">{variation.description}</div>
+                    </button>
+                  ))}
+                </div>
+                
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <div className="flex items-center space-x-2 text-blue-700 text-xs font-medium mb-1">
+                    <Zap className="w-3 h-3" />
+                    <span>Enhanced AI Analysis</span>
+                  </div>
+                  <p className="text-blue-600 text-xs">
+                    Each variation uses advanced prompting techniques for maximum accuracy and detail.
+                  </p>
+                </div>
               </div>
             )}
           </div>
         )}
 
-        {/* Prompt Display */}
+        {/* Prompt Display with Analysis */}
         {analysis.status === 'completed' && analysis.prompt && (
           <div className="space-y-3">
             <div className="bg-gray-50 rounded-lg p-4 border">
-              <p className="text-gray-700 text-sm leading-relaxed">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-medium text-gray-600">Generated Prompt</span>
+                <button
+                  onClick={() => setShowPromptAnalysis(!showPromptAnalysis)}
+                  className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  {showPromptAnalysis ? 'Hide Analysis' : 'Show Analysis'}
+                </button>
+              </div>
+              
+              <p className="text-gray-700 text-sm leading-relaxed mb-3">
                 {analysis.prompt}
               </p>
+              
+              {showPromptAnalysis && (
+                <div className="border-t pt-3 space-y-2">
+                  <div className="grid grid-cols-2 gap-4 text-xs">
+                    <div>
+                      <span className="font-medium text-gray-600">Length:</span>
+                      <span className="ml-1 text-gray-700">{analysis.prompt.length} chars</span>
+                    </div>
+                    <div>
+                      <span className="font-medium text-gray-600">Words:</span>
+                      <span className="ml-1 text-gray-700">{analysis.prompt.split(' ').length}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium text-gray-600">Style:</span>
+                      <span className="ml-1 text-gray-700 capitalize">{selectedVariation}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium text-gray-600">Quality:</span>
+                      <span className={`ml-1 font-medium ${
+                        qualityScore >= 80 ? 'text-green-600' :
+                        qualityScore >= 60 ? 'text-yellow-600' :
+                        'text-red-600'
+                      }`}>
+                        {qualityScore}%
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
             
             <div className="flex space-x-2">
@@ -217,9 +319,20 @@ ${analysis.prompt}`;
               <button
                 onClick={handleDownloadPrompt}
                 className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors flex items-center space-x-2"
+                title="Download detailed prompt file"
               >
                 <Download className="w-4 h-4" />
               </button>
+
+              {onRegeneratePrompt && (
+                <button
+                  onClick={() => handleVariationChange(selectedVariation)}
+                  className="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg font-medium transition-colors flex items-center space-x-2"
+                  title="Regenerate with enhanced AI"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                </button>
+              )}
             </div>
           </div>
         )}

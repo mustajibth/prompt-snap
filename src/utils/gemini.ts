@@ -75,7 +75,7 @@ export async function analyzeImageWithGemini(
     const base64Content = base64Data.split(',')[1];
 
     const promptStyle = PROMPT_VARIATIONS[variation];
-    const systemPrompt = getVariationPrompt(promptStyle.style);
+    const systemPrompt = getEnhancedVariationPrompt(promptStyle.style);
 
     const requestBody = {
       contents: [
@@ -94,10 +94,10 @@ export async function analyzeImageWithGemini(
         }
       ],
       generationConfig: {
-        temperature: 0.8,
+        temperature: 0.7, // Slightly lower for more consistent results
         topK: 40,
-        topP: 0.95,
-        maxOutputTokens: 300,
+        topP: 0.9, // More focused sampling
+        maxOutputTokens: 400, // Increased for more detailed prompts
       }
     };
 
@@ -121,32 +121,104 @@ export async function analyzeImageWithGemini(
     }
 
     const prompt = data.candidates[0].content.parts[0].text;
-    return prompt.trim();
+    return cleanAndEnhancePrompt(prompt.trim());
   } catch (error) {
     console.error('Error analyzing image:', error);
     throw error;
   }
 }
 
-function getVariationPrompt(style: string): string {
-  const basePrompt = "Analyze this image and create a detailed prompt for AI image generation. ";
-  
-  switch (style) {
-    case 'creative':
-      return basePrompt + "Focus on the creative and artistic elements: describe the mood, atmosphere, color palette, artistic style, and emotional impact. Make it inspiring and imaginative, perfect for creative AI generation. Extract the visual essence and transform it into a unique, creative description.";
-    
-    case 'technical':
-      return basePrompt + "Provide technical specifications: camera settings, lighting setup, composition rules, depth of field, perspective, and technical aspects. Include details about resolution, quality, and photographic techniques used.";
-    
-    case 'artistic':
-      return basePrompt + "Emphasize the artistic style and technique: art movement, brushwork, texture, medium, artistic influences, and aesthetic qualities. Describe it as if instructing an artist or AI to recreate the artistic approach.";
-    
-    case 'commercial':
-      return basePrompt + "Create a commercial-focused description: brand-suitable elements, market appeal, target audience, commercial viability, and professional presentation. Make it suitable for marketing and business use.";
-    
-    default:
-      return basePrompt + "Focus on describing the visual elements, style, composition, colors, lighting, mood, and artistic technique. Make it specific and vivid for AI art generation.";
+function getEnhancedVariationPrompt(style: string): string {
+  const baseInstruction = `You are an expert AI prompt engineer specializing in creating highly detailed and accurate prompts for AI image generation. Analyze this image carefully and create a comprehensive prompt that would recreate this image with maximum fidelity.
+
+CRITICAL REQUIREMENTS:
+1. Be extremely specific about visual details
+2. Include precise color descriptions (use specific color names, not just "blue" but "deep navy blue" or "cerulean blue")
+3. Describe lighting conditions in detail (soft diffused light, harsh directional lighting, golden hour, etc.)
+4. Specify camera angles and composition (close-up, wide shot, bird's eye view, etc.)
+5. Include texture descriptions (smooth, rough, glossy, matte, etc.)
+6. Mention artistic style or photographic technique if applicable
+7. Describe the mood and atmosphere
+8. Include any relevant technical details
+
+FORMAT: Write as a single, flowing prompt without bullet points or sections.`;
+
+  const styleSpecificInstructions = {
+    creative: `
+CREATIVE FOCUS: Emphasize the artistic and imaginative elements. Describe:
+- The emotional impact and mood of the image
+- Creative composition techniques used
+- Unique visual elements that make it stand out
+- Color harmony and artistic choices
+- Any surreal or imaginative aspects
+- The overall aesthetic appeal and artistic vision
+
+Create a prompt that captures the creative essence and would inspire an AI to generate something equally artistic and visually compelling.`,
+
+    technical: `
+TECHNICAL FOCUS: Provide precise technical specifications. Describe:
+- Camera settings equivalent (aperture, focal length, depth of field)
+- Lighting setup (key light, fill light, rim light positions)
+- Composition rules applied (rule of thirds, leading lines, symmetry)
+- Image quality aspects (sharpness, contrast, saturation)
+- Technical photographic techniques used
+- Post-processing effects visible
+- Resolution and clarity characteristics
+
+Create a prompt that would help an AI generate technically excellent and professionally composed imagery.`,
+
+    artistic: `
+ARTISTIC FOCUS: Analyze the artistic style and technique. Describe:
+- Specific art movement or style (impressionist, minimalist, baroque, etc.)
+- Brushwork or technique characteristics (if applicable)
+- Color palette and color theory application
+- Artistic composition and visual flow
+- Medium characteristics (oil painting, watercolor, digital art, etc.)
+- Artistic influences or references
+- Texture and surface qualities
+
+Create a prompt that captures the artistic methodology and would guide an AI to replicate the artistic approach.`,
+
+    commercial: `
+COMMERCIAL FOCUS: Emphasize marketable and professional aspects. Describe:
+- Professional presentation quality
+- Brand-appropriate visual elements
+- Target audience appeal
+- Commercial photography techniques
+- Product placement and styling (if applicable)
+- Professional lighting and composition
+- Market-ready aesthetic qualities
+- Commercial viability factors
+
+Create a prompt suitable for generating professional, market-ready imagery that would work in commercial contexts.`
+  };
+
+  return baseInstruction + (styleSpecificInstructions[style] || styleSpecificInstructions.creative);
+}
+
+function cleanAndEnhancePrompt(prompt: string): string {
+  // Remove common AI-generated text artifacts
+  let cleaned = prompt
+    .replace(/^(Here's|Here is|This is|I can see|The image shows|This image depicts)/i, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  // Ensure it starts with a descriptive word
+  if (!cleaned.match(/^[A-Z]/)) {
+    cleaned = cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
   }
+
+  // Add professional prompt structure if missing
+  if (!cleaned.includes('detailed') && !cleaned.includes('high quality')) {
+    cleaned = `Highly detailed, professional quality, ${cleaned}`;
+  }
+
+  // Ensure it ends properly
+  if (!cleaned.endsWith('.') && !cleaned.endsWith(',')) {
+    cleaned += '.';
+  }
+
+  return cleaned;
 }
 
 export async function analyzeImageFromUrl(
@@ -163,7 +235,7 @@ export async function analyzeImageFromUrl(
     const base64Content = base64Data.split(',')[1];
 
     const promptStyle = PROMPT_VARIATIONS[variation];
-    const systemPrompt = getVariationPrompt(promptStyle.style);
+    const systemPrompt = getEnhancedVariationPrompt(promptStyle.style);
 
     const requestBody = {
       contents: [
@@ -182,10 +254,10 @@ export async function analyzeImageFromUrl(
         }
       ],
       generationConfig: {
-        temperature: 0.8,
+        temperature: 0.7,
         topK: 40,
-        topP: 0.95,
-        maxOutputTokens: 300,
+        topP: 0.9,
+        maxOutputTokens: 400,
       }
     };
 
@@ -209,7 +281,7 @@ export async function analyzeImageFromUrl(
     }
 
     const prompt = data.candidates[0].content.parts[0].text;
-    return prompt.trim();
+    return cleanAndEnhancePrompt(prompt.trim());
   } catch (error) {
     console.error('Error analyzing image from URL:', error);
     throw error;
