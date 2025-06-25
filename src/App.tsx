@@ -212,7 +212,7 @@ ${content}`;
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">PromptSnap</h1>
-                <p className="text-gray-600 text-sm">AI Image Prompt Generator by Ajibid Studio</p>
+                <p className="text-gray-600 text-sm">by Ajibid Studio</p>
               </div>
             </div>
 
