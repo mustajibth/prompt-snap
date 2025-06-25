@@ -1,14 +1,23 @@
 import React, { useState } from 'react';
-import { Globe, Download, AlertCircle, CheckCircle, Loader, Link, Image as ImageIcon, Zap } from 'lucide-react';
+import { Globe, Download, AlertCircle, CheckCircle, Loader, Link, Image as ImageIcon, Zap, Settings } from 'lucide-react';
 import { ScrapedImage } from '../types';
 import { BatchProcessor, estimateProcessingTime } from '../utils/batchProcessor';
 import BatchProgressModal from './BatchProgressModal';
+import { 
+  AdobeStockExtensionScraper,
+  AdobeStockProxyService,
+  AdobeStockAPIService,
+  AdobeStockPuppeteerService,
+  CORSProxyService 
+} from '../utils/adobeStockScraper';
 
 interface AdobeStockProcessorProps {
   isOpen: boolean;
   onClose: () => void;
   onImagesSelected: (images: ScrapedImage[]) => void;
 }
+
+type ExtractionMethod = 'demo' | 'extension' | 'proxy' | 'api' | 'puppeteer' | 'cors';
 
 export default function AdobeStockProcessor({ isOpen, onClose, onImagesSelected }: AdobeStockProcessorProps) {
   const [adobeUrl, setAdobeUrl] = useState('');
@@ -18,6 +27,8 @@ export default function AdobeStockProcessor({ isOpen, onClose, onImagesSelected 
   const [selectedImages, setSelectedImages] = useState<Set<string>>(new Set());
   const [processingStatus, setProcessingStatus] = useState<string>('');
   const [showBatchProgress, setShowBatchProgress] = useState(false);
+  const [extractionMethod, setExtractionMethod] = useState<ExtractionMethod>('demo');
+  const [showMethodSelector, setShowMethodSelector] = useState(false);
   const [batchProgress, setBatchProgress] = useState({
     completed: 0,
     total: 0,
@@ -25,42 +36,100 @@ export default function AdobeStockProcessor({ isOpen, onClose, onImagesSelected 
     errors: 0
   });
 
+  const extractionMethods = [
+    {
+      id: 'demo' as ExtractionMethod,
+      name: 'Demo Mode',
+      description: 'Uses placeholder images from Pexels for demonstration',
+      status: 'Available',
+      statusColor: 'green'
+    },
+    {
+      id: 'extension' as ExtractionMethod,
+      name: 'Browser Extension',
+      description: 'Extract images directly from current Adobe Stock tab',
+      status: 'Recommended',
+      statusColor: 'blue'
+    },
+    {
+      id: 'api' as ExtractionMethod,
+      name: 'Adobe Stock API',
+      description: 'Official Adobe Stock API integration',
+      status: 'Requires API Key',
+      statusColor: 'purple'
+    },
+    {
+      id: 'proxy' as ExtractionMethod,
+      name: 'Proxy Service',
+      description: 'Backend proxy service for CORS bypass',
+      status: 'Backend Required',
+      statusColor: 'orange'
+    },
+    {
+      id: 'puppeteer' as ExtractionMethod,
+      name: 'Puppeteer Service',
+      description: 'Headless browser scraping service',
+      status: 'Server Required',
+      statusColor: 'red'
+    },
+    {
+      id: 'cors' as ExtractionMethod,
+      name: 'CORS Proxy',
+      description: 'Public CORS proxy with HTML parsing',
+      status: 'Limited',
+      statusColor: 'yellow'
+    }
+  ];
+
   const handleExtractImages = async () => {
-    if (!adobeUrl.trim()) {
+    if (!adobeUrl.trim() && extractionMethod !== 'extension') {
       setProcessingStatus('Please enter an Adobe Stock URL');
       return;
     }
 
-    if (!isValidAdobeStockUrl(adobeUrl)) {
-      setProcessingStatus('Please enter a valid Adobe Stock URL');
-      return;
-    }
-
     setIsProcessing(true);
-    setProcessingStatus('Extracting images from Adobe Stock...');
+    setProcessingStatus(`Extracting images using ${extractionMethods.find(m => m.id === extractionMethod)?.name}...`);
 
     try {
-      // Simulate Adobe Stock image extraction
-      const images = await extractAdobeStockImages(adobeUrl, imageCount);
+      let images: ScrapedImage[] = [];
+
+      switch (extractionMethod) {
+        case 'demo':
+          images = await extractDemoImages(adobeUrl, imageCount);
+          break;
+        case 'extension':
+          images = await AdobeStockExtensionScraper.extractImagesFromCurrentTab();
+          break;
+        case 'proxy':
+          images = await AdobeStockProxyService.extractImages(adobeUrl, imageCount);
+          break;
+        case 'api':
+          const query = extractQueryFromUrl(adobeUrl) || 'business';
+          images = await AdobeStockAPIService.searchImages(query, imageCount);
+          break;
+        case 'puppeteer':
+          images = await AdobeStockPuppeteerService.extractImages(adobeUrl, imageCount);
+          break;
+        case 'cors':
+          images = await CORSProxyService.extractImagesWithCORS(adobeUrl);
+          break;
+      }
+
       setExtractedImages(images);
-      setProcessingStatus(`Successfully extracted ${images.length} images`);
+      setProcessingStatus(`Successfully extracted ${images.length} images using ${extractionMethods.find(m => m.id === extractionMethod)?.name}`);
       
       // Auto-select all images
       const allImageIds = new Set(images.map(img => img.url));
       setSelectedImages(allImageIds);
     } catch (error) {
       console.error('Error extracting images:', error);
-      setProcessingStatus('Error extracting images. Please try again.');
+      setProcessingStatus(`Error extracting images: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsProcessing(false);
     }
   };
 
-  const isValidAdobeStockUrl = (url: string): boolean => {
-    return url.includes('stock.adobe.com') || url.includes('adobe.com');
-  };
-
-  const extractAdobeStockImages = async (url: string, count: number): Promise<ScrapedImage[]> => {
+  const extractDemoImages = async (url: string, count: number): Promise<ScrapedImage[]> => {
     // Simulate processing delay
     await new Promise(resolve => setTimeout(resolve, 2000));
     
@@ -83,6 +152,15 @@ export default function AdobeStockProcessor({ isOpen, onClose, onImagesSelected 
     }
     
     return images;
+  };
+
+  const extractQueryFromUrl = (url: string): string | null => {
+    try {
+      const urlObj = new URL(url);
+      return urlObj.searchParams.get('k') || urlObj.searchParams.get('search') || null;
+    } catch {
+      return null;
+    }
   };
 
   const toggleImageSelection = (imageUrl: string) => {
@@ -118,7 +196,7 @@ export default function AdobeStockProcessor({ isOpen, onClose, onImagesSelected 
     });
 
     const processor = new BatchProcessor({
-      maxConcurrent: 3, // Reduced for better stability
+      maxConcurrent: 3,
       delayBetweenRequests: 1500,
       retryAttempts: 2,
       onProgress: (completed, total, currentImage) => {
@@ -141,7 +219,6 @@ export default function AdobeStockProcessor({ isOpen, onClose, onImagesSelected 
     try {
       const results = await processor.processImages(selected, 'creative');
       
-      // Convert successful results to the format expected by the main app
       const successfulImages = results
         .filter(result => result.success)
         .map(result => {
@@ -149,7 +226,6 @@ export default function AdobeStockProcessor({ isOpen, onClose, onImagesSelected 
           return originalImage!;
         });
 
-      // Close progress modal and pass results
       setShowBatchProgress(false);
       onImagesSelected(successfulImages);
       onClose();
@@ -169,7 +245,6 @@ export default function AdobeStockProcessor({ isOpen, onClose, onImagesSelected 
 
   const handleClose = () => {
     onClose();
-    // Reset state
     setAdobeUrl('');
     setExtractedImages([]);
     setSelectedImages(new Set());
@@ -199,22 +274,82 @@ export default function AdobeStockProcessor({ isOpen, onClose, onImagesSelected 
                   <p className="text-white/90 text-sm">Extract and analyze multiple images from Adobe Stock</p>
                 </div>
               </div>
-              <button
-                onClick={handleClose}
-                className="p-2 hover:bg-white/20 rounded-lg transition-colors"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => setShowMethodSelector(!showMethodSelector)}
+                  className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+                  title="Extraction Methods"
+                >
+                  <Settings className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={handleClose}
+                  className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
 
           <div className="p-6">
+            {/* Method Selector */}
+            {showMethodSelector && (
+              <div className="mb-6 bg-gray-50 border border-gray-200 rounded-xl p-4">
+                <h3 className="font-semibold text-gray-900 mb-3">Extraction Methods</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {extractionMethods.map((method) => (
+                    <button
+                      key={method.id}
+                      onClick={() => setExtractionMethod(method.id)}
+                      className={`p-3 text-left border rounded-lg transition-all ${
+                        extractionMethod === method.id
+                          ? 'border-red-500 bg-red-50'
+                          : 'border-gray-200 hover:border-gray-300 bg-white'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-medium text-sm">{method.name}</span>
+                        <span className={`px-2 py-1 text-xs rounded-full ${
+                          method.statusColor === 'green' ? 'bg-green-100 text-green-700' :
+                          method.statusColor === 'blue' ? 'bg-blue-100 text-blue-700' :
+                          method.statusColor === 'purple' ? 'bg-purple-100 text-purple-700' :
+                          method.statusColor === 'orange' ? 'bg-orange-100 text-orange-700' :
+                          method.statusColor === 'red' ? 'bg-red-100 text-red-700' :
+                          'bg-yellow-100 text-yellow-700'
+                        }`}>
+                          {method.status}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-600">{method.description}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Current Method Display */}
+            <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-center space-x-2">
+                <span className="text-sm font-medium text-blue-800">
+                  Current Method: {extractionMethods.find(m => m.id === extractionMethod)?.name}
+                </span>
+                <span className={`px-2 py-1 text-xs rounded-full ${
+                  extractionMethod === 'demo' ? 'bg-green-100 text-green-700' :
+                  extractionMethod === 'extension' ? 'bg-blue-100 text-blue-700' :
+                  'bg-orange-100 text-orange-700'
+                }`}>
+                  {extractionMethods.find(m => m.id === extractionMethod)?.status}
+                </span>
+              </div>
+            </div>
+
             {/* URL Input Section */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Adobe Stock URL
+                {extractionMethod === 'extension' ? 'Current Tab' : 'Adobe Stock URL'}
               </label>
               <div className="flex space-x-3">
                 <div className="flex-1 relative">
@@ -223,8 +358,13 @@ export default function AdobeStockProcessor({ isOpen, onClose, onImagesSelected 
                     type="url"
                     value={adobeUrl}
                     onChange={(e) => setAdobeUrl(e.target.value)}
-                    placeholder="https://stock.adobe.com/search?k=landscape"
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    placeholder={
+                      extractionMethod === 'extension' 
+                        ? 'Will extract from current Adobe Stock tab'
+                        : 'https://stock.adobe.com/search?k=landscape'
+                    }
+                    disabled={extractionMethod === 'extension'}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:bg-gray-100"
                   />
                 </div>
                 <div className="w-32">
@@ -240,7 +380,7 @@ export default function AdobeStockProcessor({ isOpen, onClose, onImagesSelected 
                 </div>
                 <button
                   onClick={handleExtractImages}
-                  disabled={isProcessing || !adobeUrl.trim()}
+                  disabled={isProcessing || (!adobeUrl.trim() && extractionMethod !== 'extension')}
                   className="px-6 py-3 bg-red-500 hover:bg-red-600 disabled:bg-gray-300 text-white rounded-xl font-medium transition-colors flex items-center space-x-2"
                 >
                   {isProcessing ? (
@@ -257,30 +397,71 @@ export default function AdobeStockProcessor({ isOpen, onClose, onImagesSelected 
                 </button>
               </div>
               
-              {/* Instructions */}
+              {/* Method-specific Instructions */}
               <div className="mt-4 bg-blue-50 border border-blue-200 rounded-xl p-4">
-                <h4 className="font-medium text-blue-800 mb-2">📋 Instructions:</h4>
+                <h4 className="font-medium text-blue-800 mb-2">
+                  📋 {extractionMethods.find(m => m.id === extractionMethod)?.name} Instructions:
+                </h4>
                 <ul className="text-blue-700 text-sm space-y-1">
-                  <li>• Paste any Adobe Stock search URL or collection URL</li>
-                  <li>• Set the number of images to extract (1-100)</li>
-                  <li>• Click "Extract" to get images from the page</li>
-                  <li>• Select which images you want to analyze</li>
-                  <li>• Click "Batch Process" to generate all prompts at once</li>
+                  {extractionMethod === 'demo' && (
+                    <>
+                      <li>• Uses placeholder images from Pexels for demonstration</li>
+                      <li>• Enter any URL to simulate Adobe Stock extraction</li>
+                      <li>• Perfect for testing the batch processing workflow</li>
+                    </>
+                  )}
+                  {extractionMethod === 'extension' && (
+                    <>
+                      <li>• Navigate to Adobe Stock in another tab first</li>
+                      <li>• Click "Extract" to get images from current tab</li>
+                      <li>• Works with search results and collection pages</li>
+                    </>
+                  )}
+                  {extractionMethod === 'api' && (
+                    <>
+                      <li>• Requires Adobe Stock API key in environment variables</li>
+                      <li>• Official API with high rate limits and quality</li>
+                      <li>• Best for production applications</li>
+                    </>
+                  )}
+                  {extractionMethod === 'proxy' && (
+                    <>
+                      <li>• Requires backend proxy service setup</li>
+                      <li>• Bypasses CORS restrictions effectively</li>
+                      <li>• Good for server-side processing</li>
+                    </>
+                  )}
+                  {extractionMethod === 'puppeteer' && (
+                    <>
+                      <li>• Requires Puppeteer backend service</li>
+                      <li>• Most reliable for complex page structures</li>
+                      <li>• Handles JavaScript-rendered content</li>
+                    </>
+                  )}
+                  {extractionMethod === 'cors' && (
+                    <>
+                      <li>• Uses public CORS proxy service</li>
+                      <li>• Limited by proxy service availability</li>
+                      <li>• May have rate limiting restrictions</li>
+                    </>
+                  )}
                 </ul>
               </div>
 
-              {/* Demo Notice */}
-              <div className="mt-3 bg-amber-50 border border-amber-200 rounded-xl p-4">
-                <div className="flex items-start space-x-2">
-                  <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="text-amber-800 text-sm">
-                      <strong>Demo Mode:</strong> This is a demonstration using placeholder images from Pexels. 
-                      In production, this would require proper backend services and compliance with Adobe Stock's terms of service.
-                    </p>
+              {/* Implementation Notice */}
+              {extractionMethod !== 'demo' && (
+                <div className="mt-3 bg-amber-50 border border-amber-200 rounded-xl p-4">
+                  <div className="flex items-start space-x-2">
+                    <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-amber-800 text-sm">
+                        <strong>Implementation Required:</strong> This method requires additional setup. 
+                        Currently showing demo mode. See the implementation guide in the code for details.
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
 
             {/* Status */}
