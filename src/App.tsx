@@ -217,26 +217,28 @@ ${content}`;
             </div>
 
             <div className="flex items-center space-x-4">
-              {/* Action Buttons */}
+              {/* Action Buttons - Mobile Responsive */}
               <button
                 onClick={() => setShowScrapingModal(true)}
                 className="inline-flex items-center space-x-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors duration-200"
+                title="Search Stock Images"
               >
                 <Globe className="w-4 h-4" />
-                <span>Search Stock</span>
+                <span className="hidden sm:inline">Search Stock</span>
               </button>
 
               <button
                 onClick={() => setShowAPIKeyManager(true)}
                 className="inline-flex items-center space-x-2 px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg font-medium transition-colors duration-200"
+                title="Manage API Keys"
               >
                 <Key className="w-4 h-4" />
-                <span>API Keys</span>
+                <span className="hidden sm:inline">API Keys</span>
               </button>
 
               {analyses.length > 0 && (
                 <>
-                  <div className="text-sm text-gray-600">
+                  <div className="hidden md:block text-sm text-gray-600">
                     {completedCount} completed • {processingCount} processing • {errorCount} errors
                   </div>
                   
@@ -244,17 +246,20 @@ ${content}`;
                     <button
                       onClick={handleDownloadAll}
                       className="inline-flex items-center space-x-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors duration-200"
+                      title="Download All Prompts"
                     >
                       <Download className="w-4 h-4" />
-                      <span>Download All</span>
+                      <span className="hidden sm:inline">Download All</span>
                     </button>
                   )}
 
                   <button
                     onClick={clearAll}
                     className="px-4 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 hover:border-gray-400 rounded-lg font-medium transition-colors duration-200"
+                    title="Clear All Results"
                   >
-                    Clear All
+                    <span className="hidden sm:inline">Clear All</span>
+                    <span className="sm:hidden">Clear</span>
                   </button>
                 </>
               )}
