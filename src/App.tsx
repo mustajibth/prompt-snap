@@ -203,7 +203,7 @@ ${content}`;
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header className="bg-white shadow-sm border-b sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -258,7 +258,7 @@ ${content}`;
         </div>
       </header>
 
-      <main className="max-w-md mx-auto px-4 py-6 pb-24">
+      <main className="max-w-md mx-auto px-4 py-6 pb-20">
         {/* API Key Warning */}
         {!import.meta.env.VITE_GEMINI_API_KEY && (
           <div className="mb-8 bg-amber-50 border border-amber-200 rounded-xl p-6">
@@ -366,23 +366,14 @@ ${content}`;
       </main>
 
       {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 z-50">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 z-30">
         <div className="flex items-center justify-between">
           {/* Left side - Action buttons */}
           <div className="flex items-center space-x-3">
-            <button
-              onClick={() => setShowAPIKeyManager(true)}
-              className="flex flex-col items-center justify-center p-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition-colors duration-200 min-w-[60px]"
-              title="Manage API Keys"
-            >
-              <Key className="w-5 h-5 mb-1" />
-              <span className="text-xs font-medium">API Keys</span>
-            </button>
-
             {completedCount > 0 && (
               <button
                 onClick={handleDownloadAll}
-                className="flex flex-col items-center justify-center p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors duration-200 min-w-[60px]"
+                className="flex flex-col items-center justify-center p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors duration-200 min-w-[70px]"
                 title="Download All Prompts"
               >
                 <Download className="w-5 h-5 mb-1" />
@@ -404,7 +395,7 @@ ${content}`;
                 
                 <button
                   onClick={clearAll}
-                  className="flex flex-col items-center justify-center p-2 text-gray-600 hover:text-gray-800 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200 min-w-[50px]"
+                  className="flex flex-col items-center justify-center p-2 text-gray-600 hover:text-gray-800 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200 min-w-[60px]"
                   title="Clear All Results"
                 >
                   <Settings className="w-4 h-4 mb-1" />
