@@ -283,12 +283,42 @@ ${content}`;
           </div>
         )}
 
+        {/* Results Grid - Moved Above Upload Area */}
+        {analyses.length > 0 && (
+          <div className="mb-8">
+            <div className="mb-6">
+              <h2 className="text-xl font-semibold text-gray-800 mb-2">Generated Prompts</h2>
+              <p className="text-gray-600 text-sm">
+                {completedCount} completed • {processingCount} processing • {errorCount} errors
+              </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {analyses.map(analysis => (
+                <PromptCard 
+                  key={analysis.id} 
+                  analysis={analysis} 
+                  onRegeneratePrompt={handleRegeneratePrompt}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Upload Area */}
-        {analyses.length === 0 ? (
+        <div className="mb-8">
+          <div className="mb-6">
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">Upload Images</h2>
+            <p className="text-gray-600 text-sm">
+              Upload your images to generate AI prompts
+            </p>
+          </div>
+          <UploadArea onFilesSelected={handleFilesSelected} isProcessing={isProcessing} />
+        </div>
+
+        {/* Enhanced Features - Only show when no results */}
+        {analyses.length === 0 && (
           <div className="text-center py-12">
-            <UploadArea onFilesSelected={handleFilesSelected} isProcessing={isProcessing} />
-            
-            <div className="mt-12 max-w-4xl mx-auto">
+            <div className="max-w-4xl mx-auto">
               <h2 className="text-xl font-semibold text-gray-800 mb-6">
                 Enhanced Features
               </h2>
@@ -300,15 +330,6 @@ ${content}`;
                   <h3 className="font-medium text-gray-800 mb-2">Batch Processing</h3>
                   <p className="text-gray-600 text-sm">
                     Upload multiple images and process them all at once
-                  </p>
-                </div>
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <Globe className="w-6 h-6 text-green-600" />
-                  </div>
-                  <h3 className="font-medium text-gray-800 mb-2">Stock Search</h3>
-                  <p className="text-gray-600 text-sm">
-                    Search and analyze images from Adobe Stock & Vecteezy
                   </p>
                 </div>
                 <div className="text-center">
@@ -329,25 +350,17 @@ ${content}`;
                     Generate creative, technical, artistic, or commercial prompts
                   </p>
                 </div>
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <Download className="w-6 h-6 text-green-600" />
+                  </div>
+                  <h3 className="font-medium text-gray-800 mb-2">Export Results</h3>
+                  <p className="text-gray-600 text-sm">
+                    Download individual prompts or export all results
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        ) : (
-          <div className="mb-8">
-            <UploadArea onFilesSelected={handleFilesSelected} isProcessing={isProcessing} />
-          </div>
-        )}
-
-        {/* Results Grid */}
-        {analyses.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {analyses.map(analysis => (
-              <PromptCard 
-                key={analysis.id} 
-                analysis={analysis} 
-                onRegeneratePrompt={handleRegeneratePrompt}
-              />
-            ))}
           </div>
         )}
       </main>
