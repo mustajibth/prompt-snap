@@ -219,15 +219,6 @@ ${content}`;
             {/* Desktop Action Buttons */}
             <div className="hidden md:flex items-center space-x-4">
               <button
-                onClick={() => setShowScrapingModal(true)}
-                className="inline-flex items-center space-x-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors duration-200"
-                title="Search Stock Images"
-              >
-                <Globe className="w-4 h-4" />
-                <span>Search Stock</span>
-              </button>
-
-              <button
                 onClick={() => setShowAPIKeyManager(true)}
                 className="inline-flex items-center space-x-2 px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg font-medium transition-colors duration-200"
                 title="Manage API Keys"
