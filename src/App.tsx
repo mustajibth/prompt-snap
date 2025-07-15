@@ -217,10 +217,10 @@ ${content}`;
             </div>
 
             {/* Desktop Action Buttons */}
-            <div className="hidden md:flex items-center space-x-4">
+            <div className="flex items-center space-x-4">
               <button
                 onClick={() => setShowAPIKeyManager(true)}
-                className="inline-flex items-center space-x-2 px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg font-medium transition-colors duration-200"
+                className="inline-flex items-center space-x-2 px-3 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg font-medium transition-colors duration-200 text-sm"
                 title="Manage API Keys"
               >
                 <Key className="w-4 h-4" />
@@ -229,14 +229,14 @@ ${content}`;
 
               {analyses.length > 0 && (
                 <>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-xs text-gray-600">
                     {completedCount} completed • {processingCount} processing • {errorCount} errors
                   </div>
                   
                   {completedCount > 0 && (
                     <button
                       onClick={handleDownloadAll}
-                      className="inline-flex items-center space-x-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors duration-200"
+                      className="inline-flex items-center space-x-2 px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors duration-200 text-sm"
                       title="Download All Prompts"
                     >
                       <Download className="w-4 h-4" />
@@ -246,7 +246,7 @@ ${content}`;
 
                   <button
                     onClick={clearAll}
-                    className="px-4 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 hover:border-gray-400 rounded-lg font-medium transition-colors duration-200"
+                    className="px-3 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 hover:border-gray-400 rounded-lg font-medium transition-colors duration-200 text-sm"
                     title="Clear All Results"
                   >
                     Clear All
@@ -258,7 +258,7 @@ ${content}`;
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24 md:pb-8">
+      <main className="max-w-md mx-auto px-4 py-6 pb-24">
         {/* API Key Warning */}
         {!import.meta.env.VITE_GEMINI_API_KEY && (
           <div className="mb-8 bg-amber-50 border border-amber-200 rounded-xl p-6">
@@ -317,12 +317,12 @@ ${content}`;
 
         {/* Enhanced Features - Only show when no results */}
         {analyses.length === 0 && (
-          <div className="text-center py-12">
-            <div className="max-w-4xl mx-auto">
+          <div className="text-center py-8">
+            <div className="max-w-sm mx-auto">
               <h2 className="text-xl font-semibold text-gray-800 mb-6">
                 Enhanced Features
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-2 gap-4">
                 <div className="text-center">
                   <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
                     <FileText className="w-6 h-6 text-blue-600" />
@@ -365,20 +365,11 @@ ${content}`;
         )}
       </main>
 
-      {/* Mobile Bottom Navigation */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 z-50">
+      {/* Bottom Navigation */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 z-50">
         <div className="flex items-center justify-between">
           {/* Left side - Action buttons */}
           <div className="flex items-center space-x-3">
-            <button
-              onClick={() => setShowScrapingModal(true)}
-              className="flex flex-col items-center justify-center p-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors duration-200 min-w-[60px]"
-              title="Search Stock Images"
-            >
-              <Globe className="w-5 h-5 mb-1" />
-              <span className="text-xs font-medium">Search</span>
-            </button>
-
             <button
               onClick={() => setShowAPIKeyManager(true)}
               className="flex flex-col items-center justify-center p-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition-colors duration-200 min-w-[60px]"
@@ -413,10 +404,10 @@ ${content}`;
                 
                 <button
                   onClick={clearAll}
-                  className="flex flex-col items-center justify-center p-2 text-gray-600 hover:text-gray-800 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200 min-w-[60px]"
+                  className="flex flex-col items-center justify-center p-2 text-gray-600 hover:text-gray-800 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200 min-w-[50px]"
                   title="Clear All Results"
                 >
-                  <Settings className="w-5 h-5 mb-1" />
+                  <Settings className="w-4 h-4 mb-1" />
                   <span className="text-xs font-medium">Clear</span>
                 </button>
               </>
@@ -429,12 +420,6 @@ ${content}`;
       <APIKeyManager 
         isOpen={showAPIKeyManager} 
         onClose={() => setShowAPIKeyManager(false)} 
-      />
-      
-      <ScrapingModal 
-        isOpen={showScrapingModal} 
-        onClose={() => setShowScrapingModal(false)} 
-        onImagesSelected={handleScrapedImagesSelected}
       />
     </div>
   );
