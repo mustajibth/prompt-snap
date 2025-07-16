@@ -134,17 +134,17 @@ Style: ${selectedVariation}
   const qualityScore = getPromptQualityScore();
 
   return (
-    <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
+    <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden group">
       {/* Image Preview */}
-      <div className="relative aspect-square bg-gray-100 overflow-hidden">
+      <div className="relative aspect-video bg-gray-100 overflow-hidden">
         <img
           src={analysis.preview}
           alt={`Upload ${analysis.id}`}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
         
         {/* Status Overlay */}
-        <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 flex items-center space-x-1">
+        <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1.5 flex items-center space-x-2">
           {getStatusIcon()}
           <span className="text-xs font-medium text-gray-700">
             {analysis.status === 'analyzing' ? 'Analyzing...' : 
@@ -155,14 +155,14 @@ Style: ${selectedVariation}
 
         {/* Source Badge */}
         {getSourceBadge() && (
-          <div className="absolute top-2 left-2">
+          <div className="absolute top-3 left-3">
             {getSourceBadge()}
           </div>
         )}
 
         {/* Quality Score */}
         {qualityScore && (
-          <div className="absolute bottom-2 left-2">
+          <div className="absolute bottom-3 left-3">
             <div className={`px-2 py-1 text-xs rounded-full font-medium ${
               qualityScore >= 80 ? 'bg-green-100 text-green-800' :
               qualityScore >= 60 ? 'bg-yellow-100 text-yellow-800' :
@@ -175,8 +175,8 @@ Style: ${selectedVariation}
       </div>
 
       {/* Content */}
-      <div className="p-4">
-        <div className="flex items-center justify-between mb-2">
+      <div className="p-6">
+        <div className="flex items-center justify-between mb-3">
           <h3 className="font-semibold text-gray-800 truncate flex-1">
             {analysis.file.name}
           </h3>
@@ -186,7 +186,7 @@ Style: ${selectedVariation}
         </div>
 
         {/* Status */}
-        <div className="flex items-center space-x-2 mb-3">
+        <div className="flex items-center space-x-2 mb-4">
           <div className="h-1 flex-1 bg-gray-200 rounded-full overflow-hidden">
             <div className={`h-full transition-all duration-500 ${
               analysis.status === 'completed' ? 'bg-green-500 w-full' :
@@ -197,13 +197,13 @@ Style: ${selectedVariation}
           </div>
         </div>
 
-        <p className="text-sm text-gray-600 mb-3">
+        <p className="text-sm text-gray-600 mb-4">
           {getStatusText()}
         </p>
 
         {/* Enhanced Prompt Variations */}
         {analysis.status === 'completed' && onRegeneratePrompt && (
-          <div className="mb-3">
+          <div className="mb-4">
             <button
               onClick={() => setShowVariations(!showVariations)}
               className="flex items-center space-x-2 text-sm text-blue-600 hover:text-blue-700 font-medium mb-2"
@@ -214,7 +214,7 @@ Style: ${selectedVariation}
             </button>
             
             {showVariations && (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <div className="grid grid-cols-2 gap-2">
                   {variations.map((variation) => (
                     <button
@@ -232,7 +232,7 @@ Style: ${selectedVariation}
                   ))}
                 </div>
                 
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-2">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                   <div className="flex items-center space-x-2 text-blue-700 text-xs font-medium mb-1">
                     <Zap className="w-3 h-3" />
                     <span>Enhanced AI Analysis</span>
@@ -248,8 +248,8 @@ Style: ${selectedVariation}
 
         {/* Prompt Display with Analysis */}
         {analysis.status === 'completed' && analysis.prompt && (
-          <div className="space-y-2">
-            <div className="bg-gray-50 rounded-lg p-3 border">
+          <div className="space-y-3">
+            <div className="bg-gray-50 rounded-lg p-4 border">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-medium text-gray-600">Generated Prompt</span>
                 <button
@@ -260,7 +260,7 @@ Style: ${selectedVariation}
                 </button>
               </div>
               
-              <p className="text-gray-700 text-sm leading-relaxed mb-2">
+              <p className="text-gray-700 text-sm leading-relaxed mb-3">
                 {analysis.prompt}
               </p>
               
@@ -294,10 +294,10 @@ Style: ${selectedVariation}
               )}
             </div>
             
-            <div className="flex space-x-1">
+            <div className="flex space-x-2">
               <button
                 onClick={handleCopyPrompt}
-                className={`flex-1 flex items-center justify-center space-x-1 px-3 py-2 rounded-lg font-medium transition-all duration-200 text-sm ${
+                className={`flex-1 flex items-center justify-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
                   copied
                     ? 'bg-green-500 text-white'
                     : 'bg-blue-500 hover:bg-blue-600 text-white hover:shadow-md'
@@ -318,7 +318,7 @@ Style: ${selectedVariation}
               
               <button
                 onClick={handleDownloadPrompt}
-                className="px-3 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors flex items-center"
+                className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors flex items-center space-x-2"
                 title="Download detailed prompt file"
               >
                 <Download className="w-4 h-4" />
@@ -327,7 +327,7 @@ Style: ${selectedVariation}
               {onRegeneratePrompt && (
                 <button
                   onClick={() => handleVariationChange(selectedVariation)}
-                  className="px-3 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg font-medium transition-colors flex items-center"
+                  className="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg font-medium transition-colors flex items-center space-x-2"
                   title="Regenerate with enhanced AI"
                 >
                   <RefreshCw className="w-4 h-4" />
@@ -339,7 +339,7 @@ Style: ${selectedVariation}
 
         {/* Error Display */}
         {analysis.status === 'error' && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
             <div className="flex items-center space-x-2 text-red-600">
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
               <p className="text-sm">
