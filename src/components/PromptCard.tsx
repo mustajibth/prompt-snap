@@ -136,7 +136,7 @@ Style: ${selectedVariation}
   return (
     <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden group">
       {/* Image Preview */}
-      <div className="relative aspect-square bg-gray-100 overflow-hidden">
+      <div className="relative aspect-video bg-gray-100 overflow-hidden">
         <img
           src={analysis.preview}
           alt={`Upload ${analysis.id}`}
@@ -180,7 +180,7 @@ Style: ${selectedVariation}
           <h3 className="font-semibold text-gray-800 truncate flex-1">
             {analysis.file.name}
           </h3>
-          <span className="text-xs text-gray-500 ml-1">
+          <span className="text-xs text-gray-500 ml-2">
             {(analysis.file.size / 1024 / 1024).toFixed(1)} MB
           </span>
         </div>

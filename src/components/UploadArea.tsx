@@ -44,7 +44,7 @@ export default function UploadArea({ onFilesSelected, isProcessing }: UploadArea
   return (
     <div
       className={`
-        relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 ease-in-out
+        relative border-2 border-dashed rounded-xl p-12 text-center transition-all duration-300 ease-in-out
         ${isDragOver 
           ? 'border-blue-500 bg-blue-50 scale-[1.02]' 
           : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50'
@@ -65,19 +65,19 @@ export default function UploadArea({ onFilesSelected, isProcessing }: UploadArea
       />
       
       <div className={`transition-all duration-300 ${isDragOver ? 'scale-110' : ''}`}>
-        <div className="mx-auto w-12 h-12 bg-gradient-to-br from-blue-500 to-teal-500 rounded-full flex items-center justify-center mb-3">
+        <div className="mx-auto w-16 h-16 bg-gradient-to-br from-blue-500 to-teal-500 rounded-full flex items-center justify-center mb-4">
           {isDragOver ? (
-            <ImageIcon className="w-6 h-6 text-white" />
+            <ImageIcon className="w-8 h-8 text-white" />
           ) : (
-            <Upload className="w-6 h-6 text-white" />
+            <Upload className="w-8 h-8 text-white" />
           )}
         </div>
         
-        <h3 className="text-lg font-semibold text-gray-700 mb-2">
+        <h3 className="text-xl font-semibold text-gray-700 mb-2">
           {isDragOver ? 'Drop your images here' : 'Upload Images'}
         </h3>
         
-        <p className="text-sm text-gray-500 mb-4">
+        <p className="text-gray-500 mb-4">
           {isDragOver 
             ? 'Release to upload your images' 
             : 'Drag and drop images here, or click to select files'
@@ -85,12 +85,12 @@ export default function UploadArea({ onFilesSelected, isProcessing }: UploadArea
         </p>
         
         <div className="inline-flex items-center px-6 py-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
-          <Upload className="w-4 h-4 text-gray-600 mr-2" />
-          <span className="text-sm text-gray-700 font-medium">Choose Files</span>
+          <Upload className="w-5 h-5 text-gray-600 mr-2" />
+          <span className="text-gray-700 font-medium">Choose Files</span>
         </div>
       </div>
 
-      <div className="mt-4 text-xs text-gray-400">
+      <div className="mt-6 text-sm text-gray-400">
         Supports: JPG, PNG, GIF, WebP • Multiple files allowed
       </div>
     </div>
