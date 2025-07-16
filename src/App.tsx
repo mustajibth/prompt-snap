@@ -357,15 +357,10 @@ ${content}`;
               <h3 className="text-lg font-medium text-gray-800 mb-4 text-center">
                 Upload More Images
               </h3>
-              <PromptCard 
               <UploadArea onFilesSelected={handleFilesSelected} isProcessing={isProcessing} />
             </div>
           )}
         </div>
-              />
-            ))}
-          </div>
-        )}
       </main>
 
       {/* Mobile Bottom Navigation */}
