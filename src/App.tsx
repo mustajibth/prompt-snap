@@ -283,69 +283,85 @@ ${content}`;
           </div>
         )}
 
-        {/* Upload Area */}
-        {analyses.length === 0 ? (
-          <div className="text-center py-12">
-            <UploadArea onFilesSelected={handleFilesSelected} isProcessing={isProcessing} />
-            
-            <div className="mt-12 max-w-4xl mx-auto">
-              <h2 className="text-xl font-semibold text-gray-800 mb-6">
-                Enhanced Features
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <FileText className="w-6 h-6 text-blue-600" />
-                  </div>
-                  <h3 className="font-medium text-gray-800 mb-2">Batch Processing</h3>
-                  <p className="text-gray-600 text-sm">
-                    Upload multiple images and process them all at once
-                  </p>
-                </div>
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <Globe className="w-6 h-6 text-green-600" />
-                  </div>
-                  <h3 className="font-medium text-gray-800 mb-2">Stock Search</h3>
-                  <p className="text-gray-600 text-sm">
-                    Search and analyze images from Adobe Stock & Vecteezy
-                  </p>
-                </div>
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <Key className="w-6 h-6 text-purple-600" />
-                  </div>
-                  <h3 className="font-medium text-gray-800 mb-2">Multi API Keys</h3>
-                  <p className="text-gray-600 text-sm">
-                    Load balance across multiple Gemini API keys
-                  </p>
-                </div>
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <Zap className="w-6 h-6 text-teal-600" />
-                  </div>
-                  <h3 className="font-medium text-gray-800 mb-2">Prompt Variations</h3>
-                  <p className="text-gray-600 text-sm">
-                    Generate creative, technical, artistic, or commercial prompts
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        ) : (
+        {/* Results Grid */}
+        {analyses.length > 0 && (
           <div className="mb-8">
-            <UploadArea onFilesSelected={handleFilesSelected} isProcessing={isProcessing} />
+            <h2 className="text-xl font-semibold text-gray-800 mb-6">
+              Generated Prompts ({analyses.length})
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Reverse the order to show oldest first, newest last */}
+              {[...analyses].reverse().map(analysis => (
+                <PromptCard 
+                  key={analysis.id} 
+                  analysis={analysis} 
+                  onRegeneratePrompt={handleRegeneratePrompt}
+                />
+              ))}
+            </div>
           </div>
         )}
 
-        {/* Results Grid */}
-        {analyses.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {analyses.map(analysis => (
+        {/* Upload Area - Always at the bottom */}
+        <div className="mt-8">
+          {analyses.length === 0 ? (
+            <div className="text-center py-12">
+              <UploadArea onFilesSelected={handleFilesSelected} isProcessing={isProcessing} />
+              
+              <div className="mt-12 max-w-4xl mx-auto">
+                <h2 className="text-xl font-semibold text-gray-800 mb-6">
+                  Enhanced Features
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div className="text-center">
+                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <FileText className="w-6 h-6 text-blue-600" />
+                    </div>
+                    <h3 className="font-medium text-gray-800 mb-2">Batch Processing</h3>
+                    <p className="text-gray-600 text-sm">
+                      Upload multiple images and process them all at once
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <Key className="w-6 h-6 text-purple-600" />
+                    </div>
+                    <h3 className="font-medium text-gray-800 mb-2">Multi API Keys</h3>
+                    <p className="text-gray-600 text-sm">
+                      Load balance across multiple Gemini API keys
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <div className="w-12 h-12 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <Zap className="w-6 h-6 text-teal-600" />
+                    </div>
+                    <h3 className="font-medium text-gray-800 mb-2">Prompt Variations</h3>
+                    <p className="text-gray-600 text-sm">
+                      Generate creative, technical, artistic, or commercial prompts
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <Download className="w-6 h-6 text-green-600" />
+                    </div>
+                    <h3 className="font-medium text-gray-800 mb-2">Export Results</h3>
+                    <p className="text-gray-600 text-sm">
+                      Download individual prompts or export all results
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <h3 className="text-lg font-medium text-gray-800 mb-4 text-center">
+                Upload More Images
+              </h3>
               <PromptCard 
-                key={analysis.id} 
-                analysis={analysis} 
-                onRegeneratePrompt={handleRegeneratePrompt}
+              <UploadArea onFilesSelected={handleFilesSelected} isProcessing={isProcessing} />
+            </div>
+          )}
+        </div>
               />
             ))}
           </div>
