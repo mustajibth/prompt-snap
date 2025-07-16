@@ -358,15 +358,6 @@ ${content}`;
           {/* Left side - Action buttons */}
           <div className="flex items-center space-x-3">
             <button
-              onClick={() => setShowScrapingModal(true)}
-              className="flex flex-col items-center justify-center p-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors duration-200 min-w-[60px]"
-              title="Search Stock Images"
-            >
-              <Globe className="w-5 h-5 mb-1" />
-              <span className="text-xs font-medium">Search</span>
-            </button>
-
-            <button
               onClick={() => setShowAPIKeyManager(true)}
               className="flex flex-col items-center justify-center p-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition-colors duration-200 min-w-[60px]"
               title="Manage API Keys"
