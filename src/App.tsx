@@ -283,27 +283,8 @@ ${content}`;
           </div>
         )}
 
-        {/* Results Grid */}
-        {analyses.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-xl font-semibold text-gray-800 mb-6">
-              Generated Prompts ({analyses.length})
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Reverse the order to show oldest first, newest last */}
-              {[...analyses].reverse().map(analysis => (
-                <PromptCard 
-                  key={analysis.id} 
-                  analysis={analysis} 
-                  onRegeneratePrompt={handleRegeneratePrompt}
-                />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Upload Area - Always at the bottom */}
-        <div className="mt-8">
+        {/* Upload Area - Always at the top */}
+        <div className="mb-8">
           {analyses.length === 0 ? (
             <div className="text-center py-12">
               <UploadArea onFilesSelected={handleFilesSelected} isProcessing={isProcessing} />
@@ -361,6 +342,25 @@ ${content}`;
             </div>
           )}
         </div>
+
+        {/* Results Grid */}
+        {analyses.length > 0 && (
+          <div>
+            <h2 className="text-xl font-semibold text-gray-800 mb-6">
+              Generated Prompts ({analyses.length})
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Reverse the order to show oldest first, newest last */}
+              {[...analyses].reverse().map(analysis => (
+                <PromptCard 
+                  key={analysis.id} 
+                  analysis={analysis} 
+                  onRegeneratePrompt={handleRegeneratePrompt}
+                />
+              ))}
+            </div>
+          </div>
+        )}
       </main>
 
       {/* Mobile Bottom Navigation */}
