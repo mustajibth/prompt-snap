@@ -22,7 +22,7 @@ function App() {
       source: 'upload'
     }));
 
-    setAnalyses(prev => [...prev, ...newAnalyses]);
+    setAnalyses(prev => [...newAnalyses, ...prev]);
     setIsProcessing(true);
 
     // Process each image
@@ -81,7 +81,7 @@ function App() {
       }
     }
 
-    setAnalyses(prev => [...prev, ...newAnalyses]);
+    setAnalyses(prev => [...newAnalyses, ...prev]);
     setIsProcessing(true);
 
     // Process each scraped image
@@ -201,10 +201,10 @@ ${content}`;
   const errorCount = analyses.filter(a => a.status === 'error').length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 max-w-md mx-auto">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <header className="bg-white shadow-sm border-b fixed top-0 left-0 right-0 z-50 max-w-md mx-auto">
+        <div className="px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-teal-500 rounded-xl flex items-center justify-center">
@@ -216,67 +216,31 @@ ${content}`;
               </div>
             </div>
 
-            {/* Desktop Action Buttons */}
-            <div className="hidden md:flex items-center space-x-4">
-              <button
-                onClick={() => setShowAPIKeyManager(true)}
-                className="inline-flex items-center space-x-2 px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg font-medium transition-colors duration-200"
-                title="Manage API Keys"
-              >
-                <Key className="w-4 h-4" />
-                <span>API Keys</span>
-              </button>
 
-              {analyses.length > 0 && (
-                <>
-                  <div className="text-sm text-gray-600">
-                    {completedCount} completed • {processingCount} processing • {errorCount} errors
-                  </div>
-                  
-                  {completedCount > 0 && (
-                    <button
-                      onClick={handleDownloadAll}
-                      className="inline-flex items-center space-x-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors duration-200"
-                      title="Download All Prompts"
-                    >
-                      <Download className="w-4 h-4" />
-                      <span>Download All</span>
-                    </button>
-                  )}
-
-                  <button
-                    onClick={clearAll}
-                    className="px-4 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 hover:border-gray-400 rounded-lg font-medium transition-colors duration-200"
-                    title="Clear All Results"
-                  >
-                    Clear All
-                  </button>
-                </>
-              )}
-            </div>
+            {/* Mobile Header - Status Only */}
+            {analyses.length > 0 && (
+              <div className="text-sm text-gray-600">
+                {completedCount}/{analyses.length}
+              </div>
+            )}
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24 md:pb-8">
+      <main className="px-4 py-4 pt-20 pb-24">
         {/* API Key Warning */}
         {!import.meta.env.VITE_GEMINI_API_KEY && (
-          <div className="mb-8 bg-amber-50 border border-amber-200 rounded-xl p-6">
+          <div className="mb-6 bg-amber-50 border border-amber-200 rounded-xl p-4">
             <div className="flex items-start space-x-3">
               <AlertTriangle className="w-6 h-6 text-amber-500 flex-shrink-0 mt-0.5" />
               <div>
-                <h3 className="font-semibold text-amber-800 mb-2">Gemini API Key Required</h3>
-                <p className="text-amber-700 mb-3">
+                <h3 className="font-semibold text-amber-800 mb-2 text-sm">Gemini API Key Required</h3>
+                <p className="text-amber-700 mb-3 text-sm">
                   To use PromptSnap, you need to configure your Gemini API key. 
-                  Create a <code className="bg-amber-100 px-2 py-1 rounded">.env</code> file 
-                  in your project root and add:
                 </p>
-                <code className="block bg-amber-100 p-3 rounded-lg text-sm font-mono text-amber-800">
-                  VITE_GEMINI_API_KEY=your_api_key_here
-                </code>
-                <p className="text-amber-700 text-sm mt-2">
+                <p className="text-amber-700 text-xs mt-2">
                   Get your API key from the <a href="https://makersuite.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="underline">Google AI Studio</a>.
-                  Or use the API Key Manager above to add multiple keys.
+                  Or use the API Key Manager below to add keys.
                 </p>
               </div>
             </div>
@@ -285,62 +249,18 @@ ${content}`;
 
         {/* Upload Area */}
         {analyses.length === 0 ? (
-          <div className="text-center py-12">
+          <div className="text-center py-8">
             <UploadArea onFilesSelected={handleFilesSelected} isProcessing={isProcessing} />
-            
-            <div className="mt-12 max-w-4xl mx-auto">
-              <h2 className="text-xl font-semibold text-gray-800 mb-6">
-                Enhanced Features
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <FileText className="w-6 h-6 text-blue-600" />
-                  </div>
-                  <h3 className="font-medium text-gray-800 mb-2">Batch Processing</h3>
-                  <p className="text-gray-600 text-sm">
-                    Upload multiple images and process them all at once
-                  </p>
-                </div>
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <Globe className="w-6 h-6 text-green-600" />
-                  </div>
-                  <h3 className="font-medium text-gray-800 mb-2">Stock Search</h3>
-                  <p className="text-gray-600 text-sm">
-                    Search and analyze images from Adobe Stock & Vecteezy
-                  </p>
-                </div>
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <Key className="w-6 h-6 text-purple-600" />
-                  </div>
-                  <h3 className="font-medium text-gray-800 mb-2">Multi API Keys</h3>
-                  <p className="text-gray-600 text-sm">
-                    Load balance across multiple Gemini API keys
-                  </p>
-                </div>
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <Zap className="w-6 h-6 text-teal-600" />
-                  </div>
-                  <h3 className="font-medium text-gray-800 mb-2">Prompt Variations</h3>
-                  <p className="text-gray-600 text-sm">
-                    Generate creative, technical, artistic, or commercial prompts
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
         ) : (
-          <div className="mb-8">
+          <div className="mb-6">
             <UploadArea onFilesSelected={handleFilesSelected} isProcessing={isProcessing} />
           </div>
         )}
 
         {/* Results Grid */}
         {analyses.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="space-y-4">
             {analyses.map(analysis => (
               <PromptCard 
                 key={analysis.id} 
@@ -353,7 +273,7 @@ ${content}`;
       </main>
 
       {/* Mobile Bottom Navigation */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 z-50">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 z-50 max-w-md mx-auto">
         <div className="flex items-center justify-between">
           {/* Left side - Action buttons */}
           <div className="flex items-center space-x-3">
