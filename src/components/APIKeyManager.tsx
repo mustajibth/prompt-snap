@@ -81,7 +81,7 @@ export default function APIKeyManager({ isOpen, onClose }: APIKeyManagerProps) {
           </div>
         </div>
 
-        <div className="p-6 max-h-96 overflow-y-auto">
+        <div className="p-6 overflow-y-auto" style={{ maxHeight: 'calc(80vh - 200px)' }}>
           {/* Add New Key */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -108,7 +108,7 @@ export default function APIKeyManager({ isOpen, onClose }: APIKeyManagerProps) {
           </div>
 
           {/* API Keys List */}
-          <div className="space-y-3">
+          <div className="space-y-3 min-h-0">
             <h3 className="font-medium text-gray-900">
               API Keys ({keys.length})
             </h3>
@@ -120,7 +120,8 @@ export default function APIKeyManager({ isOpen, onClose }: APIKeyManagerProps) {
                 <p className="text-sm">Add your first Gemini API key above</p>
               </div>
             ) : (
-              keys.map((key) => (
+              <div className="space-y-3">
+                {keys.map((key) => (
                 <div
                   key={key.id}
                   className={`p-4 border rounded-lg transition-all ${
@@ -187,7 +188,8 @@ export default function APIKeyManager({ isOpen, onClose }: APIKeyManagerProps) {
                     </div>
                   </div>
                 </div>
-              ))
+                ))}
+              </div>
             )}
           </div>
         </div>
