@@ -246,6 +246,50 @@ Style: ${selectedVariation}
           </div>
         )}
 
+        {/* Action Buttons - Moved above prompt display */}
+        {analysis.status === 'completed' && analysis.prompt && (
+          <div className="flex space-x-2 mb-4">
+            <button
+              onClick={handleCopyPrompt}
+              className={`flex-1 flex items-center justify-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                copied
+                  ? 'bg-green-500 text-white'
+                  : 'bg-blue-500 hover:bg-blue-600 text-white hover:shadow-md'
+              }`}
+            >
+              {copied ? (
+                <>
+                  <Check className="w-4 h-4" />
+                  <span>Copied!</span>
+                </>
+              ) : (
+                <>
+                  <Copy className="w-4 h-4" />
+                  <span>Copy</span>
+                </>
+              )}
+            </button>
+            
+            <button
+              onClick={handleDownloadPrompt}
+              className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors flex items-center space-x-2"
+              title="Download detailed prompt file"
+            >
+              <Download className="w-4 h-4" />
+            </button>
+
+            {onRegeneratePrompt && (
+              <button
+                onClick={() => handleVariationChange(selectedVariation)}
+                className="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg font-medium transition-colors flex items-center space-x-2"
+                title="Regenerate with enhanced AI"
+              >
+                <RefreshCw className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+        )}
+
         {/* Prompt Display with Analysis */}
         {analysis.status === 'completed' && analysis.prompt && (
           <div className="space-y-3">
@@ -291,47 +335,6 @@ Style: ${selectedVariation}
                     </div>
                   </div>
                 </div>
-              )}
-            </div>
-            
-            <div className="flex space-x-2">
-              <button
-                onClick={handleCopyPrompt}
-                className={`flex-1 flex items-center justify-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                  copied
-                    ? 'bg-green-500 text-white'
-                    : 'bg-blue-500 hover:bg-blue-600 text-white hover:shadow-md'
-                }`}
-              >
-                {copied ? (
-                  <>
-                    <Check className="w-4 h-4" />
-                    <span>Copied!</span>
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-4 h-4" />
-                    <span>Copy</span>
-                  </>
-                )}
-              </button>
-              
-              <button
-                onClick={handleDownloadPrompt}
-                className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors flex items-center space-x-2"
-                title="Download detailed prompt file"
-              >
-                <Download className="w-4 h-4" />
-              </button>
-
-              {onRegeneratePrompt && (
-                <button
-                  onClick={() => handleVariationChange(selectedVariation)}
-                  className="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg font-medium transition-colors flex items-center space-x-2"
-                  title="Regenerate with enhanced AI"
-                >
-                  <RefreshCw className="w-4 h-4" />
-                </button>
               )}
             </div>
           </div>
