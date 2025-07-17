@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { Download, Zap, FileText, AlertTriangle, Settings, Globe, Key } from 'lucide-react';
+import { Download, Zap, FileText, AlertTriangle, Trash2, Globe, Key } from 'lucide-react';
 import UploadArea from './components/UploadArea';
 import PromptCard from './components/PromptCard';
 import APIKeyManager from './components/APIKeyManager';
@@ -405,7 +405,7 @@ ${content}`;
                   className="flex flex-col items-center justify-center p-2 text-gray-600 hover:text-gray-800 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200 min-w-[60px]"
                   title="Clear All Results"
                 >
-                  <Settings className="w-5 h-5 mb-1" />
+                  <Trash2 className="w-5 h-5 mb-1" />
                   <span className="text-xs font-medium">Clear</span>
                 </button>
               </>
