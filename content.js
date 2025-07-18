@@ -1,3 +1,10 @@
+import { verifySerialNumber } from './verifySerialNumber'
+
+async function checkSerial(serial) {
+  const result = await verifySerialNumber(serial)
+  console.log(result.message)
+}
+
 class PromptSnapScanner {
   constructor() {
     this.init();
