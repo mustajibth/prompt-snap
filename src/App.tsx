@@ -224,7 +224,7 @@ ${content}`;
                 title="Manage API Keys"
               >
                 <Key className="w-4 h-4" />
-                <span>API Keys</span>
+                <span>Keys</span>
               </button>
 
               {analyses.length > 0 && (
