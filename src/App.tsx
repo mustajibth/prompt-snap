@@ -1,8 +1,9 @@
 import React, { useState, useCallback } from 'react';
-import { Download, Zap, FileText, AlertTriangle, Trash2, Globe, Key } from 'lucide-react';
+import { Download, Zap, FileText, AlertTriangle, Trash2, Globe, Key, Shield } from 'lucide-react';
 import UploadArea from './components/UploadArea';
 import PromptCard from './components/PromptCard';
 import APIKeyManager from './components/APIKeyManager';
+import SerialActivationModal from './components/SerialActivationModal';
 import ScrapingModal from './components/ScrapingModal';
 import { ImageAnalysis, ScrapedImage } from './types';
 import { analyzeImageWithGemini, analyzeImageFromUrl } from './utils/gemini';
@@ -11,6 +12,7 @@ function App() {
   const [analyses, setAnalyses] = useState<ImageAnalysis[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showAPIKeyManager, setShowAPIKeyManager] = useState(false);
+  const [showSerialActivation, setShowSerialActivation] = useState(false);
   const [showScrapingModal, setShowScrapingModal] = useState(false);
 
   const handleFilesSelected = useCallback(async (files: File[]) => {
@@ -219,6 +221,15 @@ ${content}`;
             {/* Desktop Action Buttons */}
             <div className="hidden md:flex items-center space-x-4">
               <button
+                onClick={() => setShowSerialActivation(true)}
+                className="inline-flex items-center space-x-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors duration-200"
+                title="Activate Premium"
+              >
+                <Shield className="w-4 h-4" />
+                <span>Premium</span>
+              </button>
+
+              <button
                 onClick={() => setShowAPIKeyManager(true)}
                 className="inline-flex items-center space-x-2 px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg font-medium transition-colors duration-200"
                 title="Manage API Keys"
@@ -369,6 +380,15 @@ ${content}`;
           {/* Left side - Action buttons */}
           <div className="flex items-center space-x-3">
             <button
+              onClick={() => setShowSerialActivation(true)}
+              className="flex flex-col items-center justify-center p-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors duration-200 min-w-[60px]"
+              title="Activate Premium"
+            >
+              <Shield className="w-5 h-5 mb-1" />
+              <span className="text-xs font-medium">Premium</span>
+            </button>
+
+            <button
               onClick={() => setShowAPIKeyManager(true)}
               className="flex flex-col items-center justify-center p-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition-colors duration-200 min-w-[60px]"
               title="Manage API Keys"
@@ -415,6 +435,11 @@ ${content}`;
       </div>
 
       {/* Modals */}
+      <SerialActivationModal 
+        isOpen={showSerialActivation} 
+        onClose={() => setShowSerialActivation(false)} 
+      />
+      
       <APIKeyManager 
         isOpen={showAPIKeyManager} 
         onClose={() => setShowAPIKeyManager(false)} 
