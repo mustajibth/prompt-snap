@@ -226,7 +226,7 @@ ${content}`;
                 title="Activate Premium"
               >
                 <Shield className="w-4 h-4" />
-                <span>Premium</span>
+                <span>Actived</span>
               </button>
 
               <button
