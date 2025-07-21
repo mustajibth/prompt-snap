@@ -31,8 +31,8 @@ export default function SerialActivationModal({ isOpen, onClose }: SerialActivat
     // Remove all non-alphanumeric characters and convert to uppercase
     const cleaned = value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
     
-    // Limit to 16 characters
-    const limited = cleaned.substring(0, 16);
+    // Limit to 12 characters
+    const limited = cleaned.substring(0, 12);
     
     // Add dashes every 4 characters
     const formatted = limited.replace(/(.{4})/g, '$1-').replace(/-$/, '');
@@ -54,17 +54,17 @@ export default function SerialActivationModal({ isOpen, onClose }: SerialActivat
     }
 
     // Check format (XXXX-XXXX-XXXX-XXXX)
-    const serialPattern = /^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/;
+    const serialPattern = /^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/;
     if (!serialPattern.test(serial)) {
-      setError('Please enter a valid serial number format (XXXX-XXXX-XXXX-XXXX)');
+      setError('Please enter a valid serial number format (XXXX-XXXX-XXXX)');
       return false;
     }
 
     // Check against invalid patterns
     const invalidPatterns = [
-      '0000-0000-0000-0000',
-      '1111-1111-1111-1111',
-      'XXXX-XXXX-XXXX-XXXX'
+      '0000-0000-0000',
+      '1111-1111-1111',
+      'XXXX-XXXX-XXXX'
     ];
 
     if (invalidPatterns.includes(serial)) {
@@ -91,10 +91,10 @@ export default function SerialActivationModal({ isOpen, onClose }: SerialActivat
 
       // Mock validation - in real app, this would be an API call
       const validSerials = [
-        'ABCD-1234-EFGH-5678',
-        'TEST-DEMO-SERIAL-2024',
-        'PROM-SNAP-PREM-2024',
-        'AJIB-STUD-PREM-2024'
+        'ABCD-1234-EFGH',
+        'TEST-DEMO-SERI',
+        'PROM-SNAP-PREM',
+        'AJIB-STUD-2024'
       ];
 
       if (validSerials.includes(serialNumber)) {
@@ -232,13 +232,14 @@ export default function SerialActivationModal({ isOpen, onClose }: SerialActivat
                   type="text"
                   value={serialNumber}
                   onChange={handleInputChange}
-                  placeholder="XXXX-XXXX-XXXX-XXXX"
+                  placeholder="XXXX-XXXX-XXXX"
                   className={`w-full px-4 py-3 border-2 rounded-lg font-mono text-center transition-all ${
                     error 
                       ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-200' 
                       : 'border-gray-300 bg-gray-50 focus:border-blue-500 focus:ring-blue-200'
                   } focus:outline-none focus:ring-2`}
-                  maxLength={19}
+                  maxLength={14}
+                  style={{ letterSpacing: '0.1em' }}
                   disabled={isProcessing}
                 />
                 {error && (
@@ -253,9 +254,9 @@ export default function SerialActivationModal({ isOpen, onClose }: SerialActivat
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                 <p className="text-blue-800 text-xs font-medium mb-2">Demo Serial Numbers:</p>
                 <div className="space-y-1 text-xs text-blue-600 font-mono">
-                  <div>ABCD-1234-EFGH-5678</div>
-                  <div>TEST-DEMO-SERIAL-2024</div>
-                  <div>AJIB-STUD-PREM-2024</div>
+                  <div style={{ letterSpacing: '0.1em' }}>ABCD-1234-EFGH</div>
+                  <div style={{ letterSpacing: '0.1em' }}>TEST-DEMO-SERI</div>
+                  <div style={{ letterSpacing: '0.1em' }}>AJIB-STUD-2024</div>
                 </div>
               </div>
 
