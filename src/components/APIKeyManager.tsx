@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Key, Plus, Trash2, Eye, EyeOff, Settings } from 'lucide-react';
-import { APIKeyConfig } from '../types';
+import { APIKeyConfig, AIProvider } from '../types';
 import { updateAPIKeys, getAPIKeys } from '../utils/gemini';
+import { PROVIDER_CONFIGS } from '../utils/aiProviders';
 
 interface APIKeyManagerProps {
   isOpen: boolean;
@@ -11,6 +12,7 @@ interface APIKeyManagerProps {
 export default function APIKeyManager({ isOpen, onClose }: APIKeyManagerProps) {
   const [keys, setKeys] = useState<APIKeyConfig[]>([]);
   const [newKey, setNewKey] = useState('');
+  const [selectedProvider, setSelectedProvider] = useState<AIProvider>('gemini');
   const [showKeys, setShowKeys] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
@@ -22,10 +24,12 @@ export default function APIKeyManager({ isOpen, onClose }: APIKeyManagerProps) {
   const handleAddKey = () => {
     if (!newKey.trim()) return;
 
+    const providerLabel = PROVIDER_CONFIGS[selectedProvider].label;
     const updatedKeys = [...keys, {
       id: `key-${Date.now()}`,
       key: newKey.trim(),
-      name: `API Key ${keys.length + 1}`,
+      name: `${providerLabel} ${keys.filter(k => k.provider === selectedProvider).length + 1}`,
+      provider: selectedProvider,
       isActive: true,
       requestCount: 0
     }];
@@ -69,7 +73,7 @@ export default function APIKeyManager({ isOpen, onClose }: APIKeyManagerProps) {
               </div>
               <div>
                 <h2 className="text-xl font-bold text-gray-900">API Key Manager</h2>
-                <p className="text-gray-600 text-sm">Manage your Gemini API keys</p>
+                <p className="text-gray-600 text-sm">Manage your AI Provider API keys</p>
               </div>
             </div>
             <button
@@ -87,12 +91,28 @@ export default function APIKeyManager({ isOpen, onClose }: APIKeyManagerProps) {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Add New API Key
             </label>
+
+            {/* Provider Selection */}
+            <div className="mb-3">
+              <select
+                value={selectedProvider}
+                onChange={(e) => setSelectedProvider(e.target.value as AIProvider)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+              >
+                {Object.entries(PROVIDER_CONFIGS).map(([key, config]) => (
+                  <option key={key} value={key}>
+                    {config.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             <div className="flex space-x-2">
               <input
                 type="password"
                 value={newKey}
                 onChange={(e) => setNewKey(e.target.value)}
-                placeholder="Enter Gemini API key..."
+                placeholder={`Enter ${PROVIDER_CONFIGS[selectedProvider].label} API key (${PROVIDER_CONFIGS[selectedProvider].placeholder})`}
                 className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 onKeyPress={(e) => e.key === 'Enter' && handleAddKey()}
               />
@@ -117,7 +137,7 @@ export default function APIKeyManager({ isOpen, onClose }: APIKeyManagerProps) {
               <div className="text-center py-8 text-gray-500">
                 <Key className="w-12 h-12 mx-auto mb-3 text-gray-300" />
                 <p>No API keys configured</p>
-                <p className="text-sm">Add your first Gemini API key above</p>
+                <p className="text-sm">Add your first AI API key above</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -134,9 +154,12 @@ export default function APIKeyManager({ isOpen, onClose }: APIKeyManagerProps) {
                     <div className="flex-1">
                       <div className="flex items-center space-x-2 mb-2">
                         <span className="font-medium text-gray-900">{key.name}</span>
+                        <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
+                          {PROVIDER_CONFIGS[key.provider].label}
+                        </span>
                         <span className={`px-2 py-1 text-xs rounded-full ${
-                          key.isActive 
-                            ? 'bg-green-100 text-green-800' 
+                          key.isActive
+                            ? 'bg-green-100 text-green-800'
                             : 'bg-gray-100 text-gray-600'
                         }`}>
                           {key.isActive ? 'Active' : 'Inactive'}
@@ -195,16 +218,22 @@ export default function APIKeyManager({ isOpen, onClose }: APIKeyManagerProps) {
         </div>
 
         <div className="p-6 border-t border-gray-200 bg-gray-50">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col space-y-3">
             <div className="text-sm text-gray-600">
-              <p>💡 Multiple API keys enable load balancing and higher rate limits</p>
+              <p className="font-medium mb-1">Supported Providers:</p>
+              <p>Google Gemini, OpenAI, Anthropic Claude, Groq</p>
             </div>
-            <button
-              onClick={onClose}
-              className="px-6 py-2 bg-gray-900 hover:bg-gray-800 text-white rounded-lg font-medium transition-colors"
-            >
-              Done
-            </button>
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-gray-600">
+                <p>Multiple API keys enable load balancing and higher rate limits</p>
+              </div>
+              <button
+                onClick={onClose}
+                className="px-6 py-2 bg-gray-900 hover:bg-gray-800 text-white rounded-lg font-medium transition-colors"
+              >
+                Done
+              </button>
+            </div>
           </div>
         </div>
       </div>

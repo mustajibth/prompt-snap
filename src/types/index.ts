@@ -26,13 +26,20 @@ export interface ScrapedImage {
   thumbnail: string;
 }
 
+export type AIProvider = 'gemini' | 'openai' | 'deepseek' | 'anthropic' | 'groq';
+
 export interface APIKeyConfig {
   id: string;
   key: string;
   name: string;
+  provider: AIProvider;
   isActive: boolean;
   requestCount: number;
   lastUsed?: Date;
+}
+
+export interface AIResponse {
+  text: string;
 }
 
 export interface PromptVariation {

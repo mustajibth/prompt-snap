@@ -276,18 +276,22 @@ ${content}`;
             <div className="flex items-start space-x-3">
               <AlertTriangle className="w-6 h-6 text-amber-500 flex-shrink-0 mt-0.5" />
               <div>
-                <h3 className="font-semibold text-amber-800 mb-2">Gemini API Key Required</h3>
+                <h3 className="font-semibold text-amber-800 mb-2">AI API Key Required</h3>
                 <p className="text-amber-700 mb-3">
-                  To use PromptSnap, you need to configure your Gemini API key. 
-                  Create a <code className="bg-amber-100 px-2 py-1 rounded">.env</code> file 
-                  in your project root and add:
+                  PromptSnap supports multiple AI providers: Gemini, OpenAI, Anthropic Claude, and Groq.
+                  Click the <strong>API Keys</strong> button above to add your API key from any supported provider.
                 </p>
-                <code className="block bg-amber-100 p-3 rounded-lg text-sm font-mono text-amber-800">
-                  VITE_GEMINI_API_KEY=your_api_key_here
-                </code>
-                <p className="text-amber-700 text-sm mt-2">
-                  Get your API key from the <a href="https://makersuite.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="underline">Google AI Studio</a>.
-                  Or use the API Key Manager above to add multiple keys.
+                <div className="bg-amber-100 p-3 rounded-lg text-sm text-amber-800 mb-2">
+                  <p className="font-medium mb-1">Get API keys from:</p>
+                  <ul className="list-disc list-inside space-y-1">
+                    <li><a href="https://makersuite.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="underline">Google Gemini</a></li>
+                    <li><a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="underline">OpenAI</a></li>
+                    <li><a href="https://console.anthropic.com/" target="_blank" rel="noopener noreferrer" className="underline">Anthropic Claude</a></li>
+                    <li><a href="https://console.groq.com/" target="_blank" rel="noopener noreferrer" className="underline">Groq</a></li>
+                  </ul>
+                </div>
+                <p className="text-amber-700 text-sm">
+                  You can add multiple keys from different providers for load balancing and redundancy.
                 </p>
               </div>
             </div>

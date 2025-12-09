@@ -1,4 +1,5 @@
-import { GeminiResponse, APIKeyConfig, PromptVariation } from '../types';
+import { GeminiResponse, APIKeyConfig, PromptVariation, AIProvider } from '../types';
+import { analyzeWithProvider } from './aiProviders';
 
 // API Key Management
 const STORAGE_KEY = 'promptsnap_api_keys';
@@ -30,11 +31,12 @@ function saveAPIKeysToStorage(keys: APIKeyConfig[]) {
 // Initialize API keys from storage
 apiKeys = loadAPIKeysFromStorage();
 
-export function setAPIKeys(keys: string[]) {
+export function setAPIKeys(keys: string[], provider: AIProvider = 'gemini') {
   apiKeys = keys.map((key, index) => ({
     id: `key-${index}`,
     key: key.trim(),
     name: `API Key ${index + 1}`,
+    provider,
     isActive: true,
     requestCount: 0
   }));
@@ -53,13 +55,13 @@ export function updateAPIKeys(keys: APIKeyConfig[]) {
   saveAPIKeysToStorage(apiKeys);
 }
 
-function getNextAPIKey(): string {
+function getNextAPIKey(): { key: string; provider: AIProvider } {
   if (apiKeys.length === 0) {
     const envKey = import.meta.env.VITE_GEMINI_API_KEY;
     if (!envKey) {
-      throw new Error('No Gemini API keys configured. Please add API keys in settings.');
+      throw new Error('No AI API keys configured. Please add API keys in settings.');
     }
-    return envKey;
+    return { key: envKey, provider: 'gemini' };
   }
 
   const activeKeys = apiKeys.filter(key => key.isActive);
@@ -67,22 +69,20 @@ function getNextAPIKey(): string {
     throw new Error('No active API keys available.');
   }
 
-  const key = activeKeys[currentKeyIndex % activeKeys.length];
+  const keyConfig = activeKeys[currentKeyIndex % activeKeys.length];
   currentKeyIndex = (currentKeyIndex + 1) % activeKeys.length;
-  
+
   // Update usage stats
-  key.requestCount++;
-  key.lastUsed = new Date();
+  keyConfig.requestCount++;
+  keyConfig.lastUsed = new Date();
 
   // Save updated stats to storage
   saveAPIKeysToStorage(apiKeys);
 
-  return key.key;
+  return { key: keyConfig.key, provider: keyConfig.provider };
 }
 
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
-
-const PROMPT_VARIATIONS: Record<string, PromptVariation> = {
+export const PROMPT_VARIATIONS: Record<string, PromptVariation> = {
   creative: {
     style: 'creative',
     description: 'Focus on artistic elements, mood, and creative interpretation'
@@ -100,139 +100,6 @@ const PROMPT_VARIATIONS: Record<string, PromptVariation> = {
     description: 'Marketing-focused, brand-suitable descriptions'
   }
 };
-
-export async function analyzeImageWithGemini(
-  file: File, 
-  variation: keyof typeof PROMPT_VARIATIONS = 'creative'
-): Promise<string> {
-  const apiKey = getNextAPIKey();
-  
-  try {
-    // Convert file to base64
-    const base64Data = await fileToBase64(file);
-    const base64Content = base64Data.split(',')[1];
-
-    const promptStyle = PROMPT_VARIATIONS[variation];
-    const systemPrompt = getEnhancedVariationPrompt(promptStyle.style);
-
-    const requestBody = {
-      contents: [
-        {
-          parts: [
-            {
-              text: systemPrompt
-            },
-            {
-              inline_data: {
-                mime_type: file.type,
-                data: base64Content
-              }
-            }
-          ]
-        }
-      ],
-      generationConfig: {
-        temperature: 0.7, // Slightly lower for more consistent results
-        topK: 40,
-        topP: 0.9, // More focused sampling
-        maxOutputTokens: 400, // Increased for more detailed prompts
-      }
-    };
-
-    const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(requestBody),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(`Gemini API error: ${errorData.error?.message || response.statusText}`);
-    }
-
-    const data: GeminiResponse = await response.json();
-    
-    if (!data.candidates || data.candidates.length === 0) {
-      throw new Error('No response generated from Gemini API');
-    }
-
-    const prompt = data.candidates[0].content.parts[0].text;
-    return cleanAndEnhancePrompt(prompt.trim());
-  } catch (error) {
-    console.error('Error analyzing image:', error);
-    throw error;
-  }
-}
-
-function getEnhancedVariationPrompt(style: string): string {
-  const baseInstruction = `You are an expert AI prompt engineer specializing in creating highly detailed and accurate prompts for AI image generation. Analyze this image carefully and create a comprehensive prompt that would recreate this image with maximum fidelity.
-
-CRITICAL REQUIREMENTS:
-1. Be extremely specific about visual details
-2. Include precise color descriptions (use specific color names, not just "blue" but "deep navy blue" or "cerulean blue")
-3. Describe lighting conditions in detail (soft diffused light, harsh directional lighting, golden hour, etc.)
-4. Specify camera angles and composition (close-up, wide shot, bird's eye view, etc.)
-5. Include texture descriptions (smooth, rough, glossy, matte, etc.)
-6. Mention artistic style or photographic technique if applicable
-7. Describe the mood and atmosphere
-8. Include any relevant technical details
-
-FORMAT: Write as a single, flowing prompt without bullet points or sections.`;
-
-  const styleSpecificInstructions = {
-    creative: `
-CREATIVE FOCUS: Emphasize the artistic and imaginative elements. Describe:
-- The emotional impact and mood of the image
-- Creative composition techniques used
-- Unique visual elements that make it stand out
-- Color harmony and artistic choices
-- Any surreal or imaginative aspects
-- The overall aesthetic appeal and artistic vision
-
-Create a prompt that captures the creative essence and would inspire an AI to generate something equally artistic and visually compelling.`,
-
-    technical: `
-TECHNICAL FOCUS: Provide precise technical specifications. Describe:
-- Camera settings equivalent (aperture, focal length, depth of field)
-- Lighting setup (key light, fill light, rim light positions)
-- Composition rules applied (rule of thirds, leading lines, symmetry)
-- Image quality aspects (sharpness, contrast, saturation)
-- Technical photographic techniques used
-- Post-processing effects visible
-- Resolution and clarity characteristics
-
-Create a prompt that would help an AI generate technically excellent and professionally composed imagery.`,
-
-    artistic: `
-ARTISTIC FOCUS: Analyze the artistic style and technique. Describe:
-- Specific art movement or style (impressionist, minimalist, baroque, etc.)
-- Brushwork or technique characteristics (if applicable)
-- Color palette and color theory application
-- Artistic composition and visual flow
-- Medium characteristics (oil painting, watercolor, digital art, etc.)
-- Artistic influences or references
-- Texture and surface qualities
-
-Create a prompt that captures the artistic methodology and would guide an AI to replicate the artistic approach.`,
-
-    commercial: `
-COMMERCIAL FOCUS: Emphasize marketable and professional aspects. Describe:
-- Professional presentation quality
-- Brand-appropriate visual elements
-- Target audience appeal
-- Commercial photography techniques
-- Product placement and styling (if applicable)
-- Professional lighting and composition
-- Market-ready aesthetic qualities
-- Commercial viability factors
-
-Create a prompt suitable for generating professional, market-ready imagery that would work in commercial contexts.`
-  };
-
-  return baseInstruction + (styleSpecificInstructions[style] || styleSpecificInstructions.creative);
-}
 
 function cleanAndEnhancePrompt(prompt: string): string {
   // Remove common AI-generated text artifacts
@@ -259,12 +126,39 @@ function cleanAndEnhancePrompt(prompt: string): string {
   return cleaned;
 }
 
-export async function analyzeImageFromUrl(
-  imageUrl: string, 
+export async function analyzeImageWithGemini(
+  file: File,
   variation: keyof typeof PROMPT_VARIATIONS = 'creative'
 ): Promise<string> {
-  const apiKey = getNextAPIKey();
-  
+  const { key: apiKey, provider } = getNextAPIKey();
+
+  try {
+    // Convert file to base64
+    const base64Data = await fileToBase64(file);
+    const base64Content = base64Data.split(',')[1];
+
+    const prompt = await analyzeWithProvider(
+      provider,
+      apiKey,
+      base64Content,
+      file.type,
+      variation
+    );
+
+    return cleanAndEnhancePrompt(prompt.trim());
+  } catch (error) {
+    console.error('Error analyzing image:', error);
+    throw error;
+  }
+}
+
+
+export async function analyzeImageFromUrl(
+  imageUrl: string,
+  variation: keyof typeof PROMPT_VARIATIONS = 'creative'
+): Promise<string> {
+  const { key: apiKey, provider } = getNextAPIKey();
+
   try {
     // Fetch image and convert to base64
     const response = await fetch(imageUrl);
@@ -272,53 +166,14 @@ export async function analyzeImageFromUrl(
     const base64Data = await blobToBase64(blob);
     const base64Content = base64Data.split(',')[1];
 
-    const promptStyle = PROMPT_VARIATIONS[variation];
-    const systemPrompt = getEnhancedVariationPrompt(promptStyle.style);
+    const prompt = await analyzeWithProvider(
+      provider,
+      apiKey,
+      base64Content,
+      blob.type,
+      variation
+    );
 
-    const requestBody = {
-      contents: [
-        {
-          parts: [
-            {
-              text: systemPrompt
-            },
-            {
-              inline_data: {
-                mime_type: blob.type,
-                data: base64Content
-              }
-            }
-          ]
-        }
-      ],
-      generationConfig: {
-        temperature: 0.7,
-        topK: 40,
-        topP: 0.9,
-        maxOutputTokens: 400,
-      }
-    };
-
-    const apiResponse = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(requestBody),
-    });
-
-    if (!apiResponse.ok) {
-      const errorData = await apiResponse.json();
-      throw new Error(`Gemini API error: ${errorData.error?.message || apiResponse.statusText}`);
-    }
-
-    const data: GeminiResponse = await apiResponse.json();
-    
-    if (!data.candidates || data.candidates.length === 0) {
-      throw new Error('No response generated from Gemini API');
-    }
-
-    const prompt = data.candidates[0].content.parts[0].text;
     return cleanAndEnhancePrompt(prompt.trim());
   } catch (error) {
     console.error('Error analyzing image from URL:', error);
