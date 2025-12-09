@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Key, Plus, Trash2, Eye, EyeOff, Settings } from 'lucide-react';
 import { APIKeyConfig } from '../types';
-import { setAPIKeys, getAPIKeys } from '../utils/gemini';
+import { updateAPIKeys, getAPIKeys } from '../utils/gemini';
 
 interface APIKeyManagerProps {
   isOpen: boolean;
@@ -21,7 +21,7 @@ export default function APIKeyManager({ isOpen, onClose }: APIKeyManagerProps) {
 
   const handleAddKey = () => {
     if (!newKey.trim()) return;
-    
+
     const updatedKeys = [...keys, {
       id: `key-${Date.now()}`,
       key: newKey.trim(),
@@ -29,16 +29,16 @@ export default function APIKeyManager({ isOpen, onClose }: APIKeyManagerProps) {
       isActive: true,
       requestCount: 0
     }];
-    
+
     setKeys(updatedKeys);
-    setAPIKeys(updatedKeys.map(k => k.key));
+    updateAPIKeys(updatedKeys);
     setNewKey('');
   };
 
   const handleRemoveKey = (keyId: string) => {
     const updatedKeys = keys.filter(k => k.id !== keyId);
     setKeys(updatedKeys);
-    setAPIKeys(updatedKeys.map(k => k.key));
+    updateAPIKeys(updatedKeys);
   };
 
   const toggleKeyVisibility = (keyId: string) => {
@@ -49,11 +49,11 @@ export default function APIKeyManager({ isOpen, onClose }: APIKeyManagerProps) {
   };
 
   const toggleKeyActive = (keyId: string) => {
-    const updatedKeys = keys.map(k => 
+    const updatedKeys = keys.map(k =>
       k.id === keyId ? { ...k, isActive: !k.isActive } : k
     );
     setKeys(updatedKeys);
-    setAPIKeys(updatedKeys.filter(k => k.isActive).map(k => k.key));
+    updateAPIKeys(updatedKeys);
   };
 
   if (!isOpen) return null;
@@ -64,7 +64,7 @@ export default function APIKeyManager({ isOpen, onClose }: APIKeyManagerProps) {
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-teal-500 rounded-xl flex items-center justify-center">
                 <Key className="w-5 h-5 text-white" />
               </div>
               <div>

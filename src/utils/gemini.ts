@@ -1,8 +1,34 @@
 import { GeminiResponse, APIKeyConfig, PromptVariation } from '../types';
 
 // API Key Management
+const STORAGE_KEY = 'promptsnap_api_keys';
 let apiKeys: APIKeyConfig[] = [];
 let currentKeyIndex = 0;
+
+// Load API keys from localStorage on initialization
+function loadAPIKeysFromStorage(): APIKeyConfig[] {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (error) {
+    console.error('Error loading API keys from storage:', error);
+  }
+  return [];
+}
+
+// Save API keys to localStorage
+function saveAPIKeysToStorage(keys: APIKeyConfig[]) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(keys));
+  } catch (error) {
+    console.error('Error saving API keys to storage:', error);
+  }
+}
+
+// Initialize API keys from storage
+apiKeys = loadAPIKeysFromStorage();
 
 export function setAPIKeys(keys: string[]) {
   apiKeys = keys.map((key, index) => ({
@@ -12,10 +38,19 @@ export function setAPIKeys(keys: string[]) {
     isActive: true,
     requestCount: 0
   }));
+  saveAPIKeysToStorage(apiKeys);
 }
 
 export function getAPIKeys(): APIKeyConfig[] {
+  if (apiKeys.length === 0) {
+    apiKeys = loadAPIKeysFromStorage();
+  }
   return apiKeys;
+}
+
+export function updateAPIKeys(keys: APIKeyConfig[]) {
+  apiKeys = keys;
+  saveAPIKeysToStorage(apiKeys);
 }
 
 function getNextAPIKey(): string {
@@ -38,7 +73,10 @@ function getNextAPIKey(): string {
   // Update usage stats
   key.requestCount++;
   key.lastUsed = new Date();
-  
+
+  // Save updated stats to storage
+  saveAPIKeysToStorage(apiKeys);
+
   return key.key;
 }
 

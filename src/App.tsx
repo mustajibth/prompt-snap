@@ -231,7 +231,7 @@ ${content}`;
 
               <button
                 onClick={() => setShowAPIKeyManager(true)}
-                className="inline-flex items-center space-x-2 px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg font-medium transition-colors duration-200"
+                className="inline-flex items-center space-x-2 px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white rounded-lg font-medium transition-colors duration-200"
                 title="Manage API Keys"
               >
                 <Key className="w-4 h-4" />
@@ -315,8 +315,8 @@ ${content}`;
                     </p>
                   </div>
                   <div className="text-center">
-                    <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <Key className="w-6 h-6 text-purple-600" />
+                    <div className="w-12 h-12 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <Key className="w-6 h-6 text-teal-600" />
                     </div>
                     <h3 className="font-medium text-gray-800 mb-2">Multi API Keys</h3>
                     <p className="text-gray-600 text-sm">
@@ -390,7 +390,7 @@ ${content}`;
 
             <button
               onClick={() => setShowAPIKeyManager(true)}
-              className="flex flex-col items-center justify-center p-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition-colors duration-200 min-w-[60px]"
+              className="flex flex-col items-center justify-center p-2 bg-teal-500 hover:bg-teal-600 text-white rounded-lg transition-colors duration-200 min-w-[60px]"
               title="Manage API Keys"
             >
               <Key className="w-5 h-5 mb-1" />
