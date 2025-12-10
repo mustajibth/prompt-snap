@@ -221,7 +221,7 @@ export default function APIKeyManager({ isOpen, onClose }: APIKeyManagerProps) {
           <div className="flex flex-col space-y-3">
             <div className="text-sm text-gray-600">
               <p className="font-medium mb-1">Supported Providers:</p>
-              <p>Google Gemini, OpenAI, Anthropic Claude, Groq</p>
+              <p>Google Gemini, OpenAI GPT-4o, Claude 3 Haiku</p>
             </div>
             <div className="flex items-center justify-between">
               <div className="text-sm text-gray-600">

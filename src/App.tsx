@@ -278,16 +278,15 @@ ${content}`;
               <div>
                 <h3 className="font-semibold text-amber-800 mb-2">AI API Key Required</h3>
                 <p className="text-amber-700 mb-3">
-                  PromptSnap supports multiple AI providers: Gemini, OpenAI, Anthropic Claude, and Groq.
+                  PromptSnap supports multiple AI providers: Google Gemini, OpenAI GPT-4o, and Claude 3 Haiku.
                   Click the <strong>API Keys</strong> button above to add your API key from any supported provider.
                 </p>
                 <div className="bg-amber-100 p-3 rounded-lg text-sm text-amber-800 mb-2">
                   <p className="font-medium mb-1">Get API keys from:</p>
                   <ul className="list-disc list-inside space-y-1">
                     <li><a href="https://makersuite.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="underline">Google Gemini</a></li>
-                    <li><a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="underline">OpenAI</a></li>
-                    <li><a href="https://console.anthropic.com/" target="_blank" rel="noopener noreferrer" className="underline">Anthropic Claude</a></li>
-                    <li><a href="https://console.groq.com/" target="_blank" rel="noopener noreferrer" className="underline">Groq</a></li>
+                    <li><a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="underline">OpenAI GPT-4o</a></li>
+                    <li><a href="https://console.anthropic.com/" target="_blank" rel="noopener noreferrer" className="underline">Claude 3 Haiku</a></li>
                   </ul>
                 </div>
                 <p className="text-amber-700 text-sm">
@@ -322,9 +321,9 @@ ${content}`;
                     <div className="w-12 h-12 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-3">
                       <Key className="w-6 h-6 text-teal-600" />
                     </div>
-                    <h3 className="font-medium text-gray-800 mb-2">Multi API Keys</h3>
+                    <h3 className="font-medium text-gray-800 mb-2">Multi AI Providers</h3>
                     <p className="text-gray-600 text-sm">
-                      Load balance across multiple Gemini API keys
+                      Use Gemini, OpenAI, or Claude with automatic load balancing
                     </p>
                   </div>
                   <div className="text-center">

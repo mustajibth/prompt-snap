@@ -18,30 +18,16 @@ export const PROVIDER_CONFIGS: Record<AIProvider, ProviderConfig> = {
   },
   openai: {
     name: 'openai',
-    label: 'OpenAI',
+    label: 'OpenAI GPT-4o',
     placeholder: 'sk-...',
     apiEndpoint: 'https://api.openai.com/v1/chat/completions',
     requiresVisionSupport: true
   },
-  deepseek: {
-    name: 'deepseek',
-    label: 'DeepSeek',
-    placeholder: 'sk-...',
-    apiEndpoint: 'https://api.deepseek.com/v1/chat/completions',
-    requiresVisionSupport: false
-  },
   anthropic: {
     name: 'anthropic',
-    label: 'Anthropic Claude',
+    label: 'Claude 3 Haiku',
     placeholder: 'sk-ant-...',
     apiEndpoint: 'https://api.anthropic.com/v1/messages',
-    requiresVisionSupport: true
-  },
-  groq: {
-    name: 'groq',
-    label: 'Groq',
-    placeholder: 'gsk_...',
-    apiEndpoint: 'https://api.groq.com/openai/v1/chat/completions',
     requiresVisionSupport: true
   }
 };
@@ -221,7 +207,7 @@ export async function analyzeWithAnthropic(
   const systemPrompt = getEnhancedVariationPrompt(variation);
 
   const requestBody = {
-    model: 'claude-3-5-sonnet-20241022',
+    model: 'claude-3-haiku-20240307',
     max_tokens: 400,
     messages: [
       {
@@ -260,53 +246,6 @@ export async function analyzeWithAnthropic(
   return data.content[0].text;
 }
 
-export async function analyzeWithGroq(
-  apiKey: string,
-  base64Image: string,
-  mimeType: string,
-  variation: string
-): Promise<string> {
-  const config = PROVIDER_CONFIGS.groq;
-  const systemPrompt = getEnhancedVariationPrompt(variation);
-
-  const requestBody = {
-    model: 'llama-3.2-90b-vision-preview',
-    messages: [
-      {
-        role: 'user',
-        content: [
-          { type: 'text', text: systemPrompt },
-          {
-            type: 'image_url',
-            image_url: {
-              url: `data:${mimeType};base64,${base64Image}`
-            }
-          }
-        ]
-      }
-    ],
-    max_tokens: 400,
-    temperature: 0.7
-  };
-
-  const response = await fetch(config.apiEndpoint, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`
-    },
-    body: JSON.stringify(requestBody),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(`Groq API error: ${errorData.error?.message || response.statusText}`);
-  }
-
-  const data = await response.json();
-  return data.choices[0].message.content;
-}
-
 export async function analyzeWithProvider(
   provider: AIProvider,
   apiKey: string,
@@ -321,10 +260,6 @@ export async function analyzeWithProvider(
       return analyzeWithOpenAI(apiKey, base64Image, mimeType, variation);
     case 'anthropic':
       return analyzeWithAnthropic(apiKey, base64Image, mimeType, variation);
-    case 'groq':
-      return analyzeWithGroq(apiKey, base64Image, mimeType, variation);
-    case 'deepseek':
-      throw new Error('DeepSeek does not support vision models yet');
     default:
       throw new Error(`Unsupported provider: ${provider}`);
   }

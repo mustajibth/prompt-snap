@@ -26,7 +26,7 @@ export interface ScrapedImage {
   thumbnail: string;
 }
 
-export type AIProvider = 'gemini' | 'openai' | 'deepseek' | 'anthropic' | 'groq';
+export type AIProvider = 'gemini' | 'openai' | 'anthropic';
 
 export interface APIKeyConfig {
   id: string;
